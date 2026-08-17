@@ -2,37 +2,26 @@
 
 一個 **Cooking Mama 風格** 的網頁小遊戲，主題是製作長洲著名的「平安包」。
 
-## 遊戲特色
+## 最新更新（視覺升級）
 
-- 16:9 橫向專業介面
-- 6 個真實平安包製作步驟
-- 支援電腦滑鼠 + 手機觸控
-- 即時評分與反饋
-- 純 HTML / CSS / JS，無需安裝
+- 加入可愛「阿婆」角色作為指導（有對話框）
+- 專業 16:9 介面 + 更好動畫、火花特效、星星評級
+- 更流暢的操作反饋
+- 支援自訂圖片資源（`game-assets` 資料夾）
 
 ## 遊玩方式
 
-1. 直接打開 [index.html](index.html) 或使用 GitHub Pages
-2. 按照指示完成每個步驟：
-   - 混合材料
-   - 搓麵糰
-   - 包餡料（麻蓉 / 蓮蓉 / 豆沙）
-   - 發酵
-   - 蒸包
-   - 蓋「平安」印章
+1. 直接打開 `index.html`（建議下載整個 repo 或加入 game-assets）
+2. 或開啟 GitHub Pages：https://thonykwok.github.io/cheungchau-pingon-cooking-mama/
 
-## 線上試玩
+**注意**：要令圖片正常顯示，請把 `game-assets` 資料夾（包含 ahpo.jpg、dough.jpg、finished-bun.jpg、stamp.jpg、steamer.jpg、bowl.jpg 等）放在與 `index.html` 同一層目錄。
 
-如果已開啟 GitHub Pages，可直接瀏覽：
-
-**https://thonykwok.github.io/cheungchau-pingon-cooking-mama/**
-
-## 技術
-
-- 純前端（Vanilla JS）
-- 響應式 16:9 設計
-- 觸控友善
-
----
+## 六個關卡
+1. 混合材料
+2. 搓麵糰
+3. 包餡料
+4. 發酵
+5. 蒸包
+6. 蓋「平安」印
 
 Made with ❤️ for Cheung Chau culture
