@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>長洲平安包 Cooking Mama</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+
+  body {
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    overflow: hidden;
+  }
+
+  #game-container {
+    width: 100vw;
+    max-width: 1280px;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(180deg, #fff8f0 0%, #ffe8d6 100%);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    border-radius: 8px;
+  }
+
+  /* Screens */
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .screen.active {
+    display: flex;
+  }
+
+  /* Title Screen */
+  #title-screen {
+    background: linear-gradient(160deg, #ff9a76 0%, #ff6b6b 40%, #ee5a24 100%);
+    color: white;
+  }
+  #title-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(255,200,100,0.2) 0%, transparent 40%);
+  }
+  .title-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+  .game-logo {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 900;
+    text-shadow: 0 4px 0 #c0392b, 0 8px 20px rgba(0,0,0,0.3);
+    margin-bottom: 0.3em;
+    letter-spacing: 0.05em;
+  }
+  .game-subtitle {
+    font-size: clamp(1rem, 2.2vw, 1.5rem);
+    opacity: 0.95;
+    margin-bottom: 2em;
+    font-weight: 500;
+  }
+  .start-btn {
+    background: #fff;
+    color: #e74c3c;
+    border: none;
+    padding: 0.9em 2.8em;
+    font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #c0392b, 0 10px 25px rgba(0,0,0,0.25);
+    transition: transform 0.1s, box-shadow 0.1s;
+    font-family: inherit;
+  }
+  .start-btn:hover {
+    transform: translateY(2px);
+    box-shadow: 0 4px 0 #c0392b, 0 6px 15px rgba(0,0,0,0.2);
+  }
+  .start-btn:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #c0392b;
+  }
+  .deco-buns {
+    position: absolute;
+    font-size: 3rem;
+    opacity: 0.25;
+    animation: float 4s ease-in-out infinite;
+  }
+  .deco-buns:nth-child(1) { top: 12%; left: 8%; animation-delay: 0s; }
+  .deco-buns:nth-child(2) { top: 18%; right: 10%; animation-delay: 1s; }
+  .deco-buns:nth-child(3) { bottom: 15%; left: 15%; animation-delay: 2s; }
+  .deco-buns:nth-child(4) { bottom: 20%; right: 12%; animation-delay: 0.5s; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  /* HUD */
+  #hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 12%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,248,240,0.9) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2.5%;
+    z-index: 50;
+    border-bottom: 3px solid #ffccbc;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+  .step-indicator {
+    font-size: clamp(0.9rem, 1.8vw, 1.25rem);
+    font-weight: 700;
+    color: #d35400;
+  }
+  .score-box {
+    background: #fff3e0;
+    padding: 0.4em 1.2em;
+    border-radius: 30px;
+    font-weight: 700;
+    color: #e67e22;
+    font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+    border: 2px solid #ffcc80;
+  }
+  .timer-box {
+    font-size: clamp(0.95rem, 1.7vw, 1.2rem);
+    font-weight: 700;
+    color: #c0392b;
+    min-width: 4em;
+    text-align: center;
+  }
+
+  /* Instruction bar */
+  #instruction-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 14%;
+    background: linear-gradient(0deg, #fff 0%, #fff8f0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3%;
+    z-index: 50;
+    border-top: 3px solid #ffccbc;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.06);
+  }
+  #instruction-text {
+    font-size: clamp(1rem, 2.1vw, 1.45rem);
+    font-weight: 600;
+    color: #5d4037;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* Game area */
+  #game-area {
+    position: absolute;
+    top: 12%;
+    bottom: 14%;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+  }
+
+  /* Common elements */
+  .kitchen-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(180deg, #fff5eb 0%, #ffe0c2 60%, #f5d0a9 100%);
+  }
+  .counter {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 28%;
+    background: linear-gradient(180deg, #d7a86e 0%, #c48b4f 40%, #a66d3a 100%);
+    border-top: 8px solid #8d6e63;
+    box-shadow: inset 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  /* Buttons */
+  .action-btn {
+    background: linear-gradient(180deg, #ff8a65 0%, #ff5722 100%);
+    color: white;
+    border: none;
+    padding: 0.7em 1.8em;
+    font-size: clamp(1rem, 1.9vw, 1.3rem);
+    font-weight: 700;
+    border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #d84315, 0 8px 20px rgba(0,0,0,0.2);
+    transition: transform 0.1s, box-shadow 0.1s;
+    font-family: inherit;
+    z-index: 20;
+  }
+  .action-btn:hover {
+    transform: translateY(2px);
+    box-shadow: 0 3px 0 #d84315, 0 5px 12px rgba(0,0,0,0.15);
+  }
+  .action-btn:active {
+    transform: translateY(5px);
+    box-shadow: 0 0 0 #d84315;
+  }
+  .action-btn:disabled {
+    background: #bdbdbd;
+    box-shadow: 0 5px 0 #9e9e9e;
+    cursor: not-allowed;
+  }
+
+  /* ===== STAGE 1: Mix ===== */
+  .ingredient {
+    position: absolute;
+    width: 11%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    font-size: clamp(0.7rem, 1.3vw, 0.95rem);
+    font-weight: 700;
+    color: #5d4037;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.15s;
+    z-index: 10;
+    background: white;
+    border: 3px solid #ffe0b2;
+  }
+  .ingredient:active { cursor: grabbing; transform: scale(1.08); }
+  .ingredient .icon { font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 2px; }
+  .ingredient.used { opacity: 0.35; pointer-events: none; filter: grayscale(0.6); }
+
+  #mix-bowl {
+    position: absolute;
+    width: 28%;
+    aspect-ratio: 1.1;
+    left: 50%;
+    top: 38%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at 50% 40%, #fafafa 0%, #e0e0e0 70%, #bdbdbd 100%);
+    border-radius: 50% 50% 45% 45%;
+    border: 6px solid #9e9e9e;
+    box-shadow: 
+      inset 0 -20px 40px rgba(0,0,0,0.1),
+      0 15px 30px rgba(0,0,0,0.15);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  #mix-bowl::before {
+    content: '';
+    position: absolute;
+    width: 70%;
+    height: 40%;
+    top: 15%;
+    left: 15%;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+  }
+  #bowl-content {
+    position: relative;
+    z-index: 2;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  /* ===== STAGE 2: Knead ===== */
+  #dough-ball {
+    position: absolute;
+    width: 22%;
+    aspect-ratio: 1;
+    left: 50%;
+    top: 42%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle at 35% 30%, #fff8e7 0%, #f5e6c8 40%, #e8d5a3 100%);
+    border-radius: 50%;
+    box-shadow: 
+      inset -8px -8px 20px rgba(0,0,0,0.08),
+      0 10px 25px rgba(0,0,0,0.15);
+    cursor: grab;
+    z-index: 10;
+    transition: border-radius 0.2s;
+  }
+  #dough-ball.kneading {
+    border-radius: 42% 58% 48% 52%;
+  }
+  #knead-progress {
+    position: absolute;
+    bottom: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 18px;
+    background: #ffe0b2;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #ffb74d;
+  }
+  #knead-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff9800, #ff5722);
+    border-radius: 8px;
+    transition: width 0.1s;
+  }
+
+  /* ===== STAGE 3: Fill ===== */
+  .filling-option {
+    position: absolute;
+    width: 14%;
+    aspect-ratio: 1;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: white;
+    border: 3px solid #ffe0b2;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    font-weight: 700;
+    color: #5d4037;
+    font-size: clamp(0.75rem, 1.4vw, 1rem);
+    transition: transform 0.15s, border-color 0.15s;
+    z-index: 10;
+  }
+  .filling-option:hover { transform: scale(1.06); }
+  .filling-option.selected {
+    border-color: #ff5722;
+    box-shadow: 0 0 0 4px rgba(255,87,34,0.3);
+    transform: scale(1.08);
+  }
+  .filling-option .icon { font-size: clamp(1.8rem, 3.2vw, 2.6rem); }
+
+  #dough-piece {
+    position: absolute;
+    width: 20%;
+    aspect-ratio: 1;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle at 35% 30%, #fff8e7 0%, #f5e6c8 50%, #e8d5a3 100%);
+    border-radius: 50%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  }
+  #seal-btn {
+    position: absolute;
+    bottom: 22%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* ===== STAGE 4: Rise ===== */
+  #rise-dough {
+    position: absolute;
+    width: 18%;
+    aspect-ratio: 1;
+    left: 50%;
+    top: 42%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle at 35% 30%, #fff8e7 0%, #f5e6c8 50%, #e8d5a3 100%);
+    border-radius: 50%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    z-index: 8;
+    transition: transform 1.5s ease-out, width 1.5s, height 1.5s;
+  }
+  #rise-progress {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 35%;
+    height: 16px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  #rise-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #81c784, #43a047);
+    transition: width 0.1s linear;
+  }
+  .temp-control {
+    position: absolute;
+    right: 8%;
+    top: 30%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .temp-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #ffb74d;
+    background: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .temp-btn.active {
+    background: #ff9800;
+    color: white;
+    border-color: #ef6c00;
+  }
+  #temp-display {
+    font-weight: 700;
+    color: #e65100;
+    font-size: 1.1rem;
+  }
+
+  /* ===== STAGE 5: Steam ===== */
+  #steamer {
+    position: absolute;
+    width: 32%;
+    height: 55%;
+    left: 50%;
+    top: 48%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+  }
+  .steamer-pot {
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 45%;
+    background: linear-gradient(180deg, #78909c 0%, #546e7a 50%, #37474f 100%);
+    border-radius: 10% 10% 20% 20%;
+    border: 4px solid #455a64;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  .steamer-lid {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    right: 5%;
+    height: 35%;
+    background: linear-gradient(180deg, #90a4ae 0%, #607d8b 100%);
+    border-radius: 50% 50% 10% 10%;
+    border: 4px solid #455a64;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  }
+  .steam {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 50%;
+    opacity: 0;
+    animation: steamRise 2s ease-out infinite;
+  }
+  @keyframes steamRise {
+    0% { transform: translateY(0) scale(0.5); opacity: 0; }
+    20% { opacity: 0.8; }
+    100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
+  }
+  #steam-timer {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 900;
+    color: #37474f;
+    text-shadow: 0 2px 4px rgba(255,255,255,0.8);
+  }
+  .fire-control {
+    position: absolute;
+    bottom: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+  }
+  .fire-btn {
+    padding: 0.6em 1.4em;
+    border-radius: 30px;
+    border: 3px solid #ff8a65;
+    background: white;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+    color: #e64a19;
+  }
+  .fire-btn.active {
+    background: #ff5722;
+    color: white;
+    border-color: #d84315;
+  }
+
+  /* ===== STAGE 6: Stamp ===== */
+  #bun-to-stamp {
+    position: absolute;
+    width: 22%;
+    aspect-ratio: 1;
+    left: 50%;
+    top: 42%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle at 35% 30%, #fffef8 0%, #fff8e7 40%, #f5e6c8 100%);
+    border-radius: 50%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #stamp {
+    position: absolute;
+    width: 14%;
+    aspect-ratio: 1;
+    background: linear-gradient(145deg, #c62828 0%, #b71c1c 100%);
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+    cursor: grab;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    border: 3px solid #8b0000;
+  }
+  #stamp:active { cursor: grabbing; }
+  #stamp-result {
+    position: absolute;
+    font-weight: 900;
+    color: #c62828;
+    font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .stamp-guide {
+    position: absolute;
+    width: 18%;
+    aspect-ratio: 1;
+    border: 3px dashed rgba(198,40,40,0.4);
+    border-radius: 50%;
+    left: 50%;
+    top: 42%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 7;
+  }
+
+  /* ===== Result Screen ===== */
+  #result-screen {
+    background: linear-gradient(160deg, #fff3e0 0%, #ffe0b2 100%);
+  }
+  .result-content {
+    text-align: center;
+    z-index: 2;
+  }
+  .result-title {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    color: #e65100;
+    margin-bottom: 0.4em;
+  }
+  .result-score {
+    font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+    font-weight: 900;
+    color: #ff5722;
+    margin: 0.2em 0;
+  }
+  .result-rank {
+    font-size: clamp(1.3rem, 2.8vw, 2rem);
+    font-weight: 700;
+    color: #bf360c;
+    margin-bottom: 1.2em;
+  }
+  .result-bun {
+    font-size: clamp(4rem, 10vw, 8rem);
+    margin: 0.3em 0;
+    animation: bounce 1.2s ease infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  .result-btns {
+    display: flex;
+    gap: 1.5em;
+    justify-content: center;
+    margin-top: 1.5em;
+  }
+
+  /* Overlay feedback */
+  #feedback {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    font-size: clamp(1.8rem, 4vw, 3.2rem);
+    font-weight: 900;
+    color: #ff5722;
+    text-shadow: 0 3px 0 #fff, 0 6px 20px rgba(0,0,0,0.2);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+    transition: all 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  }
+  #feedback.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* Progress dots */
+  .progress-dots {
+    display: flex;
+    gap: 8px;
+    position: absolute;
+    top: 3%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+  }
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ffccbc;
+    transition: background 0.3s, transform 0.3s;
+  }
+  .dot.done { background: #ff9800; }
+  .dot.current { background: #ff5722; transform: scale(1.3); }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <!-- Title -->
+  <div id="title-screen" class="screen active">
+    <div class="deco-buns">🥟</div>
+    <div class="deco-buns">🥟</div>
+    <div class="deco-buns">🥟</div>
+    <div class="deco-buns">🥟</div>
+    <div class="title-content">
+      <div class="game-logo">長洲平安包</div>
+      <div class="game-subtitle">Cooking Mama 風格 · 製作平安包</div>
+      <button class="start-btn" id="start-btn">開始製作！</button>
+    </div>
+  </div>
+
+  <!-- Game HUD + Area -->
+  <div id="game-screen" class="screen">
+    <div id="hud">
+      <div class="step-indicator" id="step-text">步驟 1 / 6</div>
+      <div class="score-box">分數：<span id="score-val">0</span></div>
+      <div class="timer-box" id="timer-display"></div>
+    </div>
+    <div class="progress-dots" id="progress-dots"></div>
+    <div id="game-area">
+      <div class="kitchen-bg"></div>
+      <div class="counter"></div>
+      <!-- Dynamic stage content injected here -->
+    </div>
+    <div id="instruction-bar">
+      <div id="instruction-text">準備開始製作長洲平安包啦！</div>
+    </div>
+    <div id="feedback"></div>
+  </div>
+
+  <!-- Result -->
+  <div id="result-screen" class="screen">
+    <div class="result-content">
+      <div class="result-title">製作完成！</div>
+      <div class="result-bun" id="result-emoji">🥟</div>
+      <div class="result-score" id="final-score">0</div>
+      <div class="result-rank" id="final-rank">完美！</div>
+      <div class="result-btns">
+        <button class="action-btn" id="retry-btn">再整一次</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ========== STATE ==========
+  const state = {
+    score: 0,
+    stage: 0,
+    maxStages: 6,
+    stageScores: [],
+    ingredientsAdded: [],
+    kneadCount: 0,
+    selectedFilling: null,
+    sealed: false,
+    riseProgress: 0,
+    steamTime: 0,
+    steamFire: 1, // 0 low, 1 med, 2 high
+    stamped: false,
+    stampAccuracy: 0
+  };
+
+  const STAGES = [
+    { name: '混合材料', instruction: '將正確材料拖入大碗！（麵粉、酵母、沙糖、泡打粉、水）' },
+    { name: '搓麵糰', instruction: '用滑鼠／手指用力來回搓麵糰，搓到光滑為止！' },
+    { name: '包餡料', instruction: '揀選你鍾意嘅餡料，再撳「封口」！' },
+    { name: '發酵', instruction: '保持適當溫度，等麵糰發酵脹大！' },
+    { name: '蒸包', instruction: '調校火候，準時蒸熟平安包（目標 12–15 秒）！' },
+    { name: '蓋平安印', instruction: '將紅色印章準確蓋喺包子正中央！' }
+  ];
+
+  // ========== DOM ==========
+  const $ = id => document.getElementById(id);
+  const gameArea = $('game-area');
+  const instructionText = $('instruction-text');
+  const stepText = $('step-text');
+  const scoreVal = $('score-val');
+  const feedbackEl = $('feedback');
+  const progressDots = $('progress-dots');
+
+  // ========== UTILS ==========
+  function showFeedback(text, color = '#ff5722') {
+    feedbackEl.textContent = text;
+    feedbackEl.style.color = color;
+    feedbackEl.classList.add('show');
+    setTimeout(() => feedbackEl.classList.remove('show'), 900);
+  }
+
+  function addScore(pts) {
+    state.score += pts;
+    scoreVal.textContent = state.score;
+  }
+
+  function updateProgress() {
+    progressDots.innerHTML = '';
+    for (let i = 0; i < state.maxStages; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i < state.stage ? ' done' : i === state.stage ? ' current' : '');
+      progressDots.appendChild(d);
+    }
+  }
+
+  function clearGameArea() {
+    // Keep bg and counter
+    const children = [...gameArea.children];
+    children.forEach(c => {
+      if (!c.classList.contains('kitchen-bg') && !c.classList.contains('counter')) {
+        c.remove();
+      }
+    });
+  }
+
+  // ========== STAGE 1: MIX ==========
+  function startMix() {
+    clearGameArea();
+    state.ingredientsAdded = [];
+    const needed = ['flour', 'yeast', 'sugar', 'baking', 'water'];
+    const labels = {
+      flour: { icon: '🌾', name: '麵粉' },
+      yeast: { icon: '🦠', name: '酵母' },
+      sugar: { icon: '🍬', name: '沙糖' },
+      baking: { icon: '✨', name: '泡打粉' },
+      water: { icon: '💧', name: '水' },
+      salt: { icon: '🧂', name: '鹽' },
+      oil: { icon: '🫒', name: '油' }
+    };
+
+    // Bowl
+    const bowl = document.createElement('div');
+    bowl.id = 'mix-bowl';
+    bowl.innerHTML = '<div id="bowl-content">🥣</div>';
+    gameArea.appendChild(bowl);
+
+    // Ingredients positions
+    const positions = [
+      { top: '18%', left: '8%' },
+      { top: '18%', left: '22%' },
+      { top: '18%', left: '68%' },
+      { top: '18%', left: '82%' },
+      { top: '55%', left: '6%' },
+      { top: '55%', left: '80%' },
+      { top: '70%', left: '20%' }
+    ];
+    const allItems = ['flour', 'yeast', 'sugar', 'baking', 'water', 'salt', 'oil'];
+    allItems.forEach((key, i) => {
+      const el = document.createElement('div');
+      el.className = 'ingredient';
+      el.dataset.key = key;
+      el.style.top = positions[i].top;
+      el.style.left = positions[i].left;
+      el.innerHTML = `<div class="icon">${labels[key].icon}</div>${labels[key].name}`;
+      gameArea.appendChild(el);
+      makeDraggable(el, bowl, key, needed);
+    });
+
+    // Next button (hidden until done)
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'action-btn';
+    nextBtn.id = 'mix-next';
+    nextBtn.textContent = '下一步 →';
+    nextBtn.style.position = 'absolute';
+    nextBtn.style.bottom = '8%';
+    nextBtn.style.right = '5%';
+    nextBtn.style.display = 'none';
+    nextBtn.onclick = () => finishMix(needed);
+    gameArea.appendChild(nextBtn);
+  }
+
+  function makeDraggable(el, bowl, key, needed) {
+    let dragging = false, offsetX, offsetY;
+    const onStart = (e) => {
+      if (el.classList.contains('used')) return;
+      dragging = true;
+      const rect = el.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      offsetX = clientX - rect.left;
+      offsetY = clientY - rect.top;
+      el.style.zIndex = 30;
+    };
+    const onMove = (e) => {
+      if (!dragging) return;
+      e.preventDefault();
+      const container = gameArea.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      let x = clientX - container.left - offsetX;
+      let y = clientY - container.top - offsetY;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.right = 'auto';
+      el.style.bottom = 'auto';
+    };
+    const onEnd = () => {
+      if (!dragging) return;
+      dragging = false;
+      el.style.zIndex = 10;
+      const bowlRect = bowl.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const cx = elRect.left + elRect.width / 2;
+      const cy = elRect.top + elRect.height / 2;
+      if (cx > bowlRect.left && cx < bowlRect.right && cy > bowlRect.top && cy < bowlRect.bottom) {
+        // Dropped in bowl
+        el.classList.add('used');
+        state.ingredientsAdded.push(key);
+        const content = $('bowl-content');
+        if (needed.includes(key)) {
+          content.textContent = '🥣✨';
+          showFeedback('好！', '#43a047');
+          addScore(15);
+        } else {
+          content.textContent = '🥣❓';
+          showFeedback('唔需要呢樣！', '#e53935');
+          addScore(-5);
+        }
+        checkMixDone(needed);
+      }
+    };
+    el.addEventListener('mousedown', onStart);
+    el.addEventListener('touchstart', onStart, { passive: false });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchend', onEnd);
+  }
+
+  function checkMixDone(needed) {
+    const correct = needed.every(k => state.ingredientsAdded.includes(k));
+    const extras = state.ingredientsAdded.filter(k => !needed.includes(k)).length;
+    if (correct) {
+      $('mix-next').style.display = 'block';
+      if (extras === 0) showFeedback('完美材料！', '#43a047');
+    }
+  }
+
+  function finishMix(needed) {
+    const correctCount = needed.filter(k => state.ingredientsAdded.includes(k)).length;
+    const extras = state.ingredientsAdded.filter(k => !needed.includes(k)).length;
+    let pts = correctCount * 20 - extras * 10;
+    if (correctCount === 5 && extras === 0) pts += 30;
+    addScore(Math.max(0, pts));
+    state.stageScores.push(pts);
+    nextStage();
+  }
+
+  // ========== STAGE 2: KNEAD ==========
+  function startKnead() {
+    clearGameArea();
+    state.kneadCount = 0;
+    const dough = document.createElement('div');
+    dough.id = 'dough-ball';
+    gameArea.appendChild(dough);
+
+    const progress = document.createElement('div');
+    progress.id = 'knead-progress';
+    progress.innerHTML = '<div id="knead-bar"></div>';
+    gameArea.appendChild(progress);
+
+    let lastX = 0, lastY = 0, isDown = false;
+    const neededKneads = 18;
+
+    const onDown = (e) => {
+      isDown = true;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      lastX = clientX;
+      lastY = clientY;
+      dough.classList.add('kneading');
+    };
+    const onMove = (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const dist = Math.hypot(clientX - lastX, clientY - lastY);
+      if (dist > 25) {
+        state.kneadCount++;
+        lastX = clientX;
+        lastY = clientY;
+        const pct = Math.min(100, (state.kneadCount / neededKneads) * 100);
+        $('knead-bar').style.width = pct + '%';
+        // Visual squash
+        const scale = 1 + Math.sin(state.kneadCount * 0.5) * 0.08;
+        dough.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        if (state.kneadCount >= neededKneads) {
+          showFeedback('搓好啦！', '#43a047');
+          addScore(80);
+          state.stageScores.push(80);
+          setTimeout(nextStage, 800);
+          isDown = false;
+          dough.onmousedown = null;
+        }
+      }
+    };
+    const onUp = () => {
+      isDown = false;
+      dough.classList.remove('kneading');
+      dough.style.transform = 'translate(-50%, -50%) scale(1)';
+    };
+
+    dough.addEventListener('mousedown', onDown);
+    dough.addEventListener('touchstart', onDown, { passive: false });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchend', onUp);
+  }
+
+  // ========== STAGE 3: FILL ==========
+  function startFill() {
+    clearGameArea();
+    state.selectedFilling = null;
+    state.sealed = false;
+
+    const dough = document.createElement('div');
+    dough.id = 'dough-piece';
+    dough.textContent = '🥟';
+    gameArea.appendChild(dough);
+
+    const fillings = [
+      { key: 'sesame', icon: '🖤', name: '麻蓉', top: '20%', left: '8%' },
+      { key: 'lotus', icon: '🪷', name: '蓮蓉', top: '20%', left: '78%' },
+      { key: 'bean', icon: '🫘', name: '豆沙', top: '55%', left: '8%' }
+    ];
+    fillings.forEach(f => {
+      const el = document.createElement('div');
+      el.className = 'filling-option';
+      el.style.top = f.top;
+      el.style.left = f.left;
+      el.innerHTML = `<div class="icon">${f.icon}</div>${f.name}`;
+      el.onclick = () => {
+        document.querySelectorAll('.filling-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        state.selectedFilling = f.key;
+        dough.textContent = f.icon;
+        showFeedback(f.name + '！', '#43a047');
+        addScore(10);
+      };
+      gameArea.appendChild(el);
+    });
+
+    const sealBtn = document.createElement('button');
+    sealBtn.className = 'action-btn';
+    sealBtn.id = 'seal-btn';
+    sealBtn.textContent = '封口搓圓';
+    sealBtn.onclick = () => {
+      if (!state.selectedFilling) {
+        showFeedback('先揀餡料！', '#e53935');
+        return;
+      }
+      state.sealed = true;
+      dough.textContent = '🥟';
+      dough.style.background = 'radial-gradient(circle at 35% 30%, #fffef8 0%, #fff8e7 50%, #f0e0b8 100%)';
+      showFeedback('封得好好！', '#43a047');
+      addScore(50);
+      state.stageScores.push(60);
+      setTimeout(nextStage, 900);
+    };
+    gameArea.appendChild(sealBtn);
+  }
+
+  // ========== STAGE 4: RISE ==========
+  function startRise() {
+    clearGameArea();
+    state.riseProgress = 0;
+    let temp = 1; // 0 cold, 1 warm, 2 hot
+    let interval = null;
+
+    const dough = document.createElement('div');
+    dough.id = 'rise-dough';
+    gameArea.appendChild(dough);
+
+    const progress = document.createElement('div');
+    progress.id = 'rise-progress';
+    progress.innerHTML = '<div id="rise-bar"></div>';
+    gameArea.appendChild(progress);
+
+    const controls = document.createElement('div');
+    controls.className = 'temp-control';
+    controls.innerHTML = `
+      <button class="temp-btn" data-t="0">❄️</button>
+      <button class="temp-btn active" data-t="1">☀️</button>
+      <button class="temp-btn" data-t="2">🔥</button>
+      <div id="temp-display">溫暖</div>
+    `;
+    gameArea.appendChild(controls);
+
+    const tempLabels = ['太凍', '溫暖', '太熱'];
+    controls.querySelectorAll('.temp-btn').forEach(btn => {
+      btn.onclick = () => {
+        controls.querySelectorAll('.temp-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        temp = +btn.dataset.t;
+        $('temp-display').textContent = tempLabels[temp];
+      };
+    });
+
+    interval = setInterval(() => {
+      let speed = 0;
+      if (temp === 1) speed = 1.8;
+      else if (temp === 2) speed = 0.6; // too hot, slow + risk
+      else speed = 0.3;
+
+      state.riseProgress += speed;
+      if (state.riseProgress > 100) state.riseProgress = 100;
+      $('rise-bar').style.width = state.riseProgress + '%';
+
+      // Visual grow
+      const scale = 1 + (state.riseProgress / 100) * 0.55;
+      dough.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+      if (state.riseProgress >= 100) {
+        clearInterval(interval);
+        let pts = temp === 1 ? 90 : temp === 2 ? 50 : 40;
+        showFeedback(temp === 1 ? '發酵完美！' : '發酵完成', temp === 1 ? '#43a047' : '#ff9800');
+        addScore(pts);
+        state.stageScores.push(pts);
+        setTimeout(nextStage, 1000);
+      }
+    }, 100);
+  }
+
+  // ========== STAGE 5: STEAM ==========
+  function startSteam() {
+    clearGameArea();
+    state.steamTime = 0;
+    state.steamFire = 1;
+    let running = true;
+    let interval = null;
+
+    const steamer = document.createElement('div');
+    steamer.id = 'steamer';
+    steamer.innerHTML = `
+      <div class="steamer-lid"></div>
+      <div class="steamer-pot"></div>
+      <div id="steam-timer">0.0s</div>
+    `;
+    gameArea.appendChild(steamer);
+
+    // Steam particles
+    for (let i = 0; i < 6; i++) {
+      const s = document.createElement('div');
+      s.className = 'steam';
+      s.style.left = (30 + i * 8) + '%';
+      s.style.bottom = '50%';
+      s.style.animationDelay = (i * 0.3) + 's';
+      steamer.appendChild(s);
+    }
+
+    const fireCtrl = document.createElement('div');
+    fireCtrl.className = 'fire-control';
+    fireCtrl.innerHTML = `
+      <button class="fire-btn" data-f="0">小火</button>
+      <button class="fire-btn active" data-f="1">中火</button>
+      <button class="fire-btn" data-f="2">大火</button>
+    `;
+    gameArea.appendChild(fireCtrl);
+
+    fireCtrl.querySelectorAll('.fire-btn').forEach(btn => {
+      btn.onclick = () => {
+        fireCtrl.querySelectorAll('.fire-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.steamFire = +btn.dataset.f;
+      };
+    });
+
+    const doneBtn = document.createElement('button');
+    doneBtn.className = 'action-btn';
+    doneBtn.textContent = '出爐！';
+    doneBtn.style.position = 'absolute';
+    doneBtn.style.bottom = '22%';
+    doneBtn.style.right = '6%';
+    doneBtn.onclick = () => {
+      if (!running) return;
+      running = false;
+      clearInterval(interval);
+      // Ideal 12-15s on medium, slight variance ok
+      const t = state.steamTime;
+      let pts = 0;
+      if (t >= 12 && t <= 15.5 && state.steamFire === 1) pts = 100;
+      else if (t >= 11 && t <= 17) pts = 70;
+      else if (t >= 9 && t <= 19) pts = 45;
+      else pts = 20;
+      showFeedback(pts >= 90 ? '火候完美！' : pts >= 60 ? '都唔錯！' : '差少少…', pts >= 90 ? '#43a047' : '#ff9800');
+      addScore(pts);
+      state.stageScores.push(pts);
+      setTimeout(nextStage, 1000);
+    };
+    gameArea.appendChild(doneBtn);
+
+    interval = setInterval(() => {
+      if (!running) return;
+      const speed = state.steamFire === 0 ? 0.6 : state.steamFire === 1 ? 1 : 1.5;
+      state.steamTime += 0.1 * speed;
+      $('steam-timer').textContent = state.steamTime.toFixed(1) + 's';
+      // Change steam opacity based on fire
+      document.querySelectorAll('.steam').forEach(s => {
+        s.style.opacity = state.steamFire === 0 ? 0.3 : state.steamFire === 1 ? 0.7 : 1;
+      });
+    }, 100);
+  }
+
+  // ========== STAGE 6: STAMP ==========
+  function startStamp() {
+    clearGameArea();
+    state.stamped = false;
+
+    const guide = document.createElement('div');
+    guide.className = 'stamp-guide';
+    gameArea.appendChild(guide);
+
+    const bun = document.createElement('div');
+    bun.id = 'bun-to-stamp';
+    gameArea.appendChild(bun);
+
+    const stamp = document.createElement('div');
+    stamp.id = 'stamp';
+    stamp.textContent = '平安';
+    stamp.style.left = '75%';
+    stamp.style.top = '25%';
+    gameArea.appendChild(stamp);
+
+    const resultText = document.createElement('div');
+    resultText.id = 'stamp-result';
+    resultText.textContent = '平安';
+    bun.appendChild(resultText);
+
+    let dragging = false, ox, oy;
+
+    const onStart = (e) => {
+      if (state.stamped) return;
+      dragging = true;
+      const rect = stamp.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      ox = clientX - rect.left;
+      oy = clientY - rect.top;
+    };
+    const onMove = (e) => {
+      if (!dragging) return;
+      e.preventDefault();
+      const container = gameArea.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      stamp.style.left = (clientX - container.left - ox) + 'px';
+      stamp.style.top = (clientY - container.top - oy) + 'px';
+    };
+    const onEnd = () => {
+      if (!dragging || state.stamped) return;
+      dragging = false;
+      // Check accuracy vs center of bun
+      const bunRect = bun.getBoundingClientRect();
+      const stampRect = stamp.getBoundingClientRect();
+      const bx = bunRect.left + bunRect.width / 2;
+      const by = bunRect.top + bunRect.height / 2;
+      const sx = stampRect.left + stampRect.width / 2;
+      const sy = stampRect.top + stampRect.height / 2;
+      const dist = Math.hypot(sx - bx, sy - by);
+      const maxDist = bunRect.width * 0.35;
+      let pts = 0;
+      if (dist < maxDist * 0.35) {
+        pts = 100;
+        showFeedback('完美蓋印！', '#43a047');
+      } else if (dist < maxDist * 0.7) {
+        pts = 70;
+        showFeedback('幾準！', '#ff9800');
+      } else {
+        pts = 30;
+        showFeedback('偏咗少少', '#e53935');
+      }
+      state.stampAccuracy = pts;
+      state.stamped = true;
+      resultText.style.opacity = '1';
+      stamp.style.opacity = '0.5';
+      stamp.style.pointerEvents = 'none';
+      addScore(pts);
+      state.stageScores.push(pts);
+      setTimeout(showResult, 1200);
+    };
+
+    stamp.addEventListener('mousedown', onStart);
+    stamp.addEventListener('touchstart', onStart, { passive: false });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchend', onEnd);
+  }
+
+  // ========== FLOW ==========
+  function nextStage() {
+    state.stage++;
+    if (state.stage >= state.maxStages) {
+      showResult();
+      return;
+    }
+    updateUI();
+    startCurrentStage();
+  }
+
+  function updateUI() {
+    stepText.textContent = `步驟 ${state.stage + 1} / ${state.maxStages} · ${STAGES[state.stage].name}`;
+    instructionText.textContent = STAGES[state.stage].instruction;
+    updateProgress();
+  }
+
+  function startCurrentStage() {
+    const starters = [startMix, startKnead, startFill, startRise, startSteam, startStamp];
+    starters[state.stage]();
+  }
+
+  function showResult() {
+    $('game-screen').classList.remove('active');
+    $('result-screen').classList.add('active');
+    $('final-score').textContent = state.score;
+    let rank = '', emoji = '🥟';
+    if (state.score >= 450) { rank = '🌟 完美平安包！長洲之光！'; emoji = '🏆🥟'; }
+    else if (state.score >= 350) { rank = '超好食！阿婆都讚！'; emoji = '😋🥟'; }
+    else if (state.score >= 250) { rank = '唔錯呀，可以再練！'; emoji = '👍🥟'; }
+    else { rank = '加油，下次會更好！'; emoji = '💪🥟'; }
+    $('final-rank').textContent = rank;
+    $('result-emoji').textContent = emoji;
+  }
+
+  function startGame() {
+    state.score = 0;
+    state.stage = 0;
+    state.stageScores = [];
+    state.ingredientsAdded = [];
+    state.kneadCount = 0;
+    state.selectedFilling = null;
+    state.sealed = false;
+    state.riseProgress = 0;
+    state.steamTime = 0;
+    state.stamped = false;
+    scoreVal.textContent = '0';
+    $('title-screen').classList.remove('active');
+    $('result-screen').classList.remove('active');
+    $('game-screen').classList.add('active');
+    updateUI();
+    startCurrentStage();
+  }
+
+  // Events
+  $('start-btn').onclick = startGame;
+  $('retry-btn').onclick = startGame;
+
+  // Prevent scroll on mobile
+  document.addEventListener('touchmove', e => {
+    if (e.target.closest('#game-container')) e.preventDefault();
+  }, { passive: false });
+})();
+</script>
+</body>
+</html>
