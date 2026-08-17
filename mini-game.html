@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>長洲平安包 - 混合材料（測試版）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-user-select:none; touch-action:none; }
+  body {
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    background: linear-gradient(180deg, #fff8f0 0%, #ffe8d6 100%);
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  #hud {
+    height: 12%;
+    background: rgba(255,255,255,0.95);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 4%;
+    border-bottom: 3px solid #ffccbc;
+    font-weight: 700; color: #d35400;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+  }
+  #game-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .ingredient {
+    position: absolute;
+    width: 13%; aspect-ratio: 1;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #ffe0b2;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: grab; z-index: 10;
+    font-weight: 700; color: #5d4037;
+    font-size: clamp(0.7rem, 1.8vw, 1rem);
+  }
+  .ingredient:active { cursor: grabbing; transform: scale(1.08); }
+  .ingredient .icon { font-size: clamp(1.5rem, 3.5vw, 2.3rem); }
+  .ingredient.used { opacity: 0.35; pointer-events: none; filter: grayscale(0.6); }
+
+  #bowl {
+    position: absolute;
+    width: 32%; aspect-ratio: 1.1;
+    left: 50%; top: 42%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at 50% 40%, #fafafa 0%, #e0e0e0 70%, #bdbdbd 100%);
+    border-radius: 50% 50% 45% 45%;
+    border: 6px solid #9e9e9e;
+    box-shadow: inset 0 -15px 30px rgba(0,0,0,0.1), 0 12px 25px rgba(0,0,0,0.15);
+    z-index: 5;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #bowl-content {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    z-index: 6;
+  }
+
+  #bottom {
+    height: 14%;
+    background: white;
+    display: flex; align-items: center; justify-content: center;
+    border-top: 3px solid #ffccbc;
+    font-size: clamp(1rem, 2.3vw, 1.35rem);
+    font-weight: 600; color: #5d4037;
+    text-align: center;
+    padding: 0 3%;
+  }
+
+  .action-btn {
+    background: linear-gradient(180deg, #ff8a65, #ff5722);
+    color: white; border: none;
+    padding: 0.7em 1.8em;
+    font-size: clamp(1rem, 2.2vw, 1.3rem);
+    font-weight: 700; border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #d84315, 0 8px 18px rgba(0,0,0,0.2);
+    font-family: inherit;
+  }
+  .action-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #d84315; }
+
+  /* Result */
+  #result {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, #fff3e0, #ffe0b2);
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 50;
+    text-align: center;
+  }
+  #result.show { display: flex; }
+  .result-title { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 900; color: #e65100; margin-bottom: 0.3em; }
+  .result-score { font-size: clamp(3rem, 8vw, 5rem); font-weight: 900; color: #ff5722; margin: 0.2em 0; }
+  .result-btns { display: flex; gap: 1.2em; margin-top: 1.5em; flex-wrap: wrap; justify-content: center; }
+  .btn-end {
+    background: linear-gradient(180deg, #78909c, #546e7a);
+    box-shadow: 0 5px 0 #37474f, 0 8px 18px rgba(0,0,0,0.2);
+  }
+
+  #feedback {
+    position: absolute; top: 40%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    font-weight: 900; color: #ff5722;
+    text-shadow: 0 3px 0 #fff;
+    opacity: 0; pointer-events: none; z-index: 40;
+    transition: all 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  }
+  #feedback.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+</style>
+</head>
+<body>
+  <div id="hud">
+    <div>混合材料</div>
+    <div>分數：<span id="score">0</span></div>
+  </div>
+
+  <div id="game-area">
+    <div id="bowl"><div id="bowl-content">🥣</div></div>
+  </div>
+
+  <div id="bottom">將正確材料拖入大碗！（麵粉、酵母、沙糖、泡打粉、水）</div>
+  <div id="feedback"></div>
+
+  <div id="result">
+    <div class="result-title">製作完成！</div>
+    <div class="result-score" id="final-score">100</div>
+    <div style="font-size:1.3rem;color:#bf360c;font-weight:700;margin-bottom:0.5em;">完美！</div>
+    <div class="result-btns">
+      <button class="action-btn" id="btn-retry">重玩一次</button>
+      <button class="action-btn btn-end" id="btn-end">結束小遊戲</button>
+    </div>
+  </div>
+
+<script>
+(function() {
+  let score = 0;
+  let added = [];
+  const needed = ['flour', 'yeast', 'sugar', 'baking', 'water'];
+  const labels = {
+    flour: {icon:'🌾', name:'麵粉'},
+    yeast: {icon:'🦠', name:'酵母'},
+    sugar: {icon:'🍬', name:'沙糖'},
+    baking:{icon:'✨', name:'泡打粉'},
+    water: {icon:'💧', name:'水'},
+    salt:  {icon:'🧂', name:'鹽'},
+    oil:   {icon:'🫒', name:'油'}
+  };
+
+  const gameArea = document.getElementById('game-area');
+  const bowl = document.getElementById('bowl');
+  const feedback = document.getElementById('feedback');
+
+  function showFeedback(text, color) {
+    feedback.textContent = text;
+    feedback.style.color = color || '#ff5722';
+    feedback.classList.add('show');
+    setTimeout(() => feedback.classList.remove('show'), 800);
+  }
+
+  function startGame() {
+    score = 0;
+    added = [];
+    document.getElementById('score').textContent = '0';
+    document.getElementById('result').classList.remove('show');
+    document.getElementById('bowl-content').textContent = '🥣';
+
+    // clear old ingredients
+    document.querySelectorAll('.ingredient').forEach(el => el.remove());
+    document.getElementById('next-btn')?.remove();
+
+    const positions = [
+      {top:'12%', left:'6%'}, {top:'12%', left:'22%'}, {top:'12%', left:'68%'},
+      {top:'12%', left:'84%'}, {top:'55%', left:'5%'}, {top:'55%', left:'82%'}, {top:'72%', left:'20%'}
+    ];
+    const items = ['flour','yeast','sugar','baking','water','salt','oil'];
+    items.forEach((key, i) => {
+      const el = document.createElement('div');
+      el.className = 'ingredient';
+      el.dataset.key = key;
+      el.style.top = positions[i].top;
+      el.style.left = positions[i].left;
+      el.innerHTML = `<div class="icon">${labels[key].icon}</div>${labels[key].name}`;
+      gameArea.appendChild(el);
+      makeDraggable(el, key);
+    });
+  }
+
+  function makeDraggable(el, key) {
+    let dragging = false, ox, oy;
+    const onStart = (e) => {
+      if (el.classList.contains('used')) return;
+      dragging = true;
+      const rect = el.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      ox = cx - rect.left; oy = cy - rect.top;
+      el.style.zIndex = 30;
+    };
+    const onMove = (e) => {
+      if (!dragging) return;
+      e.preventDefault();
+      const cont = gameArea.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      el.style.left = (cx - cont.left - ox) + 'px';
+      el.style.top  = (cy - cont.top  - oy) + 'px';
+      el.style.right = el.style.bottom = 'auto';
+    };
+    const onEnd = () => {
+      if (!dragging) return;
+      dragging = false;
+      el.style.zIndex = 10;
+      const br = bowl.getBoundingClientRect();
+      const er = el.getBoundingClientRect();
+      const mx = er.left + er.width/2, my = er.top + er.height/2;
+      if (mx > br.left && mx < br.right && my > br.top && my < br.bottom) {
+        el.classList.add('used');
+        added.push(key);
+        if (needed.includes(key)) {
+          document.getElementById('bowl-content').textContent = '🥣✨';
+          showFeedback('好！', '#43a047');
+        } else {
+          document.getElementById('bowl-content').textContent = '🥣❓';
+          showFeedback('唔需要！', '#e53935');
+        }
+        checkDone();
+      }
+    };
+    el.addEventListener('mousedown', onStart);
+    el.addEventListener('touchstart', onStart, {passive:false});
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, {passive:false});
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchend', onEnd);
+  }
+
+  function checkDone() {
+    const correct = needed.every(k => added.includes(k));
+    if (correct) {
+      // 固定 100 分
+      score = 100;
+      document.getElementById('score').textContent = '100';
+      setTimeout(() => {
+        document.getElementById('final-score').textContent = '100';
+        document.getElementById('result').classList.add('show');
+      }, 600);
+    }
+  }
+
+  document.getElementById('btn-retry').onclick = startGame;
+
+  document.getElementById('btn-end').onclick = () => {
+    // 傳送分數俾大遊戲，並通知關閉
+    window.parent.postMessage({
+      type: 'PINGON_GAME_FINISH',
+      score: score,
+      action: 'close'
+    }, '*');
+  };
+
+  // 開始
+  startGame();
+
+  // 防止手機滑動
+  document.addEventListener('touchmove', e => {
+    if (e.target.closest('body')) e.preventDefault();
+  }, {passive:false});
+})();
+</script>
+</body>
+</html>

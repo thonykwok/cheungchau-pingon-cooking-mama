@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>大遊戲 - 長洲冒險</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    background: linear-gradient(135deg, #1a3a5c 0%, #0d2137 100%);
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    color: white;
+    position: relative;
+  }
+
+  /* 大遊戲主畫面 */
+  #main-screen {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .game-title {
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 900;
+    margin-bottom: 0.3em;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .game-desc {
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    opacity: 0.85;
+    margin-bottom: 2.5em;
+  }
+
+  .launch-btn {
+    background: linear-gradient(180deg, #ff8a65, #ff5722);
+    color: white; border: none;
+    padding: 1em 2.8em;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 0 #d84315, 0 14px 30px rgba(0,0,0,0.35);
+    font-family: inherit;
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .launch-btn:hover {
+    transform: translateY(3px);
+    box-shadow: 0 5px 0 #d84315, 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .launch-btn:active {
+    transform: translateY(8px);
+    box-shadow: 0 0 0 #d84315;
+  }
+
+  /* 右上角分數 */
+  #score-panel {
+    position: absolute;
+    top: 20px; right: 24px;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(8px);
+    padding: 0.6em 1.4em;
+    border-radius: 40px;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-weight: 700;
+    border: 2px solid rgba(255,255,255,0.2);
+    z-index: 10;
+  }
+  #big-score {
+    color: #ffcc80;
+    font-size: 1.25em;
+  }
+
+  /* 遮罩 + iframe */
+  #overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  #overlay.show {
+    display: flex;
+  }
+
+  #mini-frame {
+    width: 90%;
+    height: 90%;
+    max-width: 1100px;
+    max-height: 720px;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    background: #fff8f0;
+  }
+
+  .hint {
+    position: absolute;
+    bottom: 30px;
+    font-size: 0.95rem;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+  <!-- 右上角分數 -->
+  <div id="score-panel">
+    總分：<span id="big-score">0</span>
+  </div>
+
+  <!-- 主畫面 -->
+  <div id="main-screen">
+    <div class="game-title">長洲冒險</div>
+    <div class="game-desc">按下按鈕體驗「製作平安包」小遊戲</div>
+    <button class="launch-btn" id="launch-btn">開始製作平安包</button>
+    <div class="hint">（測試版：完成混合材料即可得 100 分）</div>
+  </div>
+
+  <!-- 遮罩 + iframe -->
+  <div id="overlay">
+    <iframe id="mini-frame" src="mini-game.html"></iframe>
+  </div>
+
+<script>
+  const overlay = document.getElementById('overlay');
+  const bigScoreEl = document.getElementById('big-score');
+  let totalScore = 0;
+
+  // 開啟小遊戲
+  document.getElementById('launch-btn').onclick = () => {
+    overlay.classList.add('show');
+  };
+
+  // 接收小遊戲傳來的分數
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'PINGON_GAME_FINISH') {
+      const gained = event.data.score || 0;
+      totalScore += gained;
+      bigScoreEl.textContent = totalScore;
+
+      // 關閉小遊戲
+      if (event.data.action === 'close') {
+        overlay.classList.remove('show');
+        // 可選：重置 iframe（方便下次重玩時係全新狀態）
+        document.getElementById('mini-frame').src = document.getElementById('mini-frame').src;
+      }
+    }
+  });
+</script>
+</body>
+</html>
