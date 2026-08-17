@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google 街景 360 - 長洲</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Login Screen */
+    #login-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+    #login-screen.hidden { display: none; }
+
+    .login-card {
+      background: #1e293b;
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+      max-width: 420px;
+      width: 100%;
+    }
+    .login-card h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+      color: #f8fafc;
+    }
+    .login-card p {
+      color: #94a3b8;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+    .google-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      color: #1f2937;
+      border: none;
+      padding: 0.9rem 1.8rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    }
+    .google-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .google-btn img {
+      width: 22px;
+      height: 22px;
+    }
+    .error-msg {
+      margin-top: 1.2rem;
+      color: #f87171;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    /* Main App */
+    #app-screen {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+    }
+    #app-screen.show { display: flex; }
+
+    header {
+      background: #1e293b;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #334155;
+      z-index: 10;
+    }
+    header .title {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    header .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+    .logout-btn {
+      background: #334155;
+      color: #e2e8f0;
+      border: none;
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      transition: background 0.15s;
+    }
+    .logout-btn:hover { background: #475569; }
+
+    #street-view {
+      flex: 1;
+      width: 100%;
+      background: #0f172a;
+    }
+
+    .loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f172a;
+      font-size: 1.1rem;
+      color: #94a3b8;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Screen -->
+  <div id="login-screen">
+    <div class="login-card">
+      <h1>Google 街景 360</h1>
+      <p>請使用授權帳戶登入以繼續</p>
+      <button class="google-btn" id="login-btn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+        使用 Google 帳戶登入
+      </button>
+      <div class="error-msg" id="error-msg">你沒有權限使用此系統</div>
+    </div>
+  </div>
+
+  <!-- App Screen -->
+  <div id="app-screen">
+    <header>
+      <div class="title">長洲 Google 街景 360</div>
+      <div class="user-info">
+        <span id="user-email"></span>
+        <button class="logout-btn" id="logout-btn">登出</button>
+      </div>
+    </header>
+    <div id="street-view"></div>
+    <div class="loading" id="loading">載入街景中…</div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyC6Po370Zcm8V_otBATZuF5OO9nEoUGd_I",
+      authDomain: "streetview-b2862.firebaseapp.com",
+      projectId: "streetview-b2862",
+      storageBucket: "streetview-b2862.firebasestorage.app",
+      messagingSenderId: "191102946985",
+      appId: "1:191102946985:web:a100e962fc933216c3a3b8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Only allow this email
+    const ALLOWED_EMAIL = "info@rgb-workshop.com";
+
+    // Google Maps API Key
+    const MAPS_API_KEY = "AIzaSyDqLsWNz8PB44_JRCrUzqKYnV0P8fREBp0";
+
+    // Default location: Cheung Chau (長洲)
+    const DEFAULT_POSITION = { lat: 22.2081, lng: 114.0286 };
+
+    // Elements
+    const loginScreen = document.getElementById('login-screen');
+    const appScreen = document.getElementById('app-screen');
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const errorMsg = document.getElementById('error-msg');
+    const userEmailEl = document.getElementById('user-email');
+    const loadingEl = document.getElementById('loading');
+
+    let panorama = null;
+    let mapsLoaded = false;
+
+    // Login
+    loginBtn.addEventListener('click', async () => {
+      errorMsg.classList.remove('show');
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const email = result.user.email;
+        if (email !== ALLOWED_EMAIL) {
+          await signOut(auth);
+          errorMsg.classList.add('show');
+          return;
+        }
+        // onAuthStateChanged will handle the rest
+      } catch (err) {
+        console.error(err);
+        errorMsg.textContent = "登入失敗，請重試";
+        errorMsg.classList.add('show');
+      }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth);
+    });
+
+    // Auth state listener
+    onAuthStateChanged(auth, (user) => {
+      if (user && user.email === ALLOWED_EMAIL) {
+        loginScreen.classList.add('hidden');
+        appScreen.classList.add('show');
+        userEmailEl.textContent = user.email;
+        initStreetView();
+      } else {
+        loginScreen.classList.remove('hidden');
+        appScreen.classList.remove('show');
+        if (panorama) {
+          // clean up if needed
+        }
+      }
+    });
+
+    // Load Google Maps script and init Street View
+    function initStreetView() {
+      if (mapsLoaded) {
+        createPanorama();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        mapsLoaded = true;
+        createPanorama();
+      };
+      script.onerror = () => {
+        loadingEl.textContent = "載入 Google Maps 失敗，請檢查 API Key 或網路";
+      };
+      document.head.appendChild(script);
+    }
+
+    function createPanorama() {
+      const streetViewDiv = document.getElementById('street-view');
+      panorama = new google.maps.StreetViewPanorama(streetViewDiv, {
+        position: DEFAULT_POSITION,
+        pov: {
+          heading: 165,
+          pitch: 0
+        },
+        zoom: 1,
+        addressControl: true,
+        linksControl: true,
+        panControl: true,
+        enableCloseButton: false,
+        fullscreenControl: true
+      });
+
+      // Hide loading when ready
+      google.maps.event.addListenerOnce(panorama, 'status_changed', () => {
+        if (panorama.getStatus() === 'OK') {
+          loadingEl.style.display = 'none';
+        } else {
+          loadingEl.textContent = "此位置暫時沒有街景資料，可嘗試移動位置";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
