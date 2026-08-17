@@ -124,6 +124,45 @@
       flex: 1;
       width: 100%;
       background: #0f172a;
+      position: relative;
+    }
+
+    /* 水彩風格濾鏡 */
+    #street-view.watercolor {
+      filter: 
+        saturate(1.35)
+        contrast(0.92)
+        brightness(1.08)
+        sepia(0.18)
+        hue-rotate(-8deg);
+    }
+    #street-view.watercolor::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: 
+        radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(255,240,220,0.1) 0%, transparent 45%);
+      mix-blend-mode: soft-light;
+      z-index: 2;
+    }
+
+    .style-toggle {
+      background: #334155;
+      color: #e2e8f0;
+      border: none;
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      transition: background 0.15s;
+    }
+    .style-toggle:hover { background: #475569; }
+    .style-toggle.active {
+      background: #0ea5e9;
+      color: white;
     }
 
     .loading {
@@ -159,6 +198,7 @@
     <header>
       <div class="title">長洲 Google 街景 360</div>
       <div class="user-info">
+        <button class="style-toggle active" id="style-toggle">水彩風格</button>
         <span id="user-email"></span>
         <button class="logout-btn" id="logout-btn">登出</button>
       </div>
@@ -203,9 +243,23 @@
     const errorMsg = document.getElementById('error-msg');
     const userEmailEl = document.getElementById('user-email');
     const loadingEl = document.getElementById('loading');
+    const styleToggle = document.getElementById('style-toggle');
+    const streetViewDiv = document.getElementById('street-view');
 
     let panorama = null;
     let mapsLoaded = false;
+    let isWatercolor = true;
+
+    // 預設開啟水彩風格
+    streetViewDiv.classList.add('watercolor');
+
+    // 切換水彩風格
+    styleToggle.addEventListener('click', () => {
+      isWatercolor = !isWatercolor;
+      streetViewDiv.classList.toggle('watercolor', isWatercolor);
+      styleToggle.classList.toggle('active', isWatercolor);
+      styleToggle.textContent = isWatercolor ? '水彩風格' : '原始風格';
+    });
 
     // Login
     loginBtn.addEventListener('click', async () => {
@@ -218,7 +272,6 @@
           errorMsg.classList.add('show');
           return;
         }
-        // onAuthStateChanged will handle the rest
       } catch (err) {
         console.error(err);
         errorMsg.textContent = "登入失敗，請重試";
@@ -241,9 +294,6 @@
       } else {
         loginScreen.classList.remove('hidden');
         appScreen.classList.remove('show');
-        if (panorama) {
-          // clean up if needed
-        }
       }
     });
 
@@ -269,7 +319,6 @@
     }
 
     function createPanorama() {
-      const streetViewDiv = document.getElementById('street-view');
       panorama = new google.maps.StreetViewPanorama(streetViewDiv, {
         position: DEFAULT_POSITION,
         pov: {
@@ -284,7 +333,6 @@
         fullscreenControl: true
       });
 
-      // Hide loading when ready
       google.maps.event.addListenerOnce(panorama, 'status_changed', () => {
         if (panorama.getStatus() === 'OK') {
           loadingEl.style.display = 'none';
