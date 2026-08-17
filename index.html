@@ -7,220 +7,230 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
 
+  :root {
+    --orange: #ff6b35;
+    --orange-dark: #e85a2a;
+    --cream: #fff8f0;
+    --wood: #c48b4f;
+    --brown: #5d4037;
+  }
+
   * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: none;
+    margin: 0; padding: 0; box-sizing: border-box;
+    user-select: none; -webkit-user-select: none; touch-action: none;
   }
 
   body {
     background: #1a1a2e;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: flex; justify-content: center; align-items: center;
     min-height: 100vh;
     font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
     overflow: hidden;
   }
 
   #game-container {
-    width: 100vw;
-    max-width: 1280px;
+    width: 100vw; max-width: 1280px;
     aspect-ratio: 16 / 9;
-    background: linear-gradient(180deg, #fff8f0 0%, #ffe8d6 100%);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 0 40px rgba(0,0,0,0.5);
-    border-radius: 8px;
+    position: relative; overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.6);
+    background: #fff8f0;
   }
 
-  /* Screens */
   .screen {
-    position: absolute;
-    inset: 0;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    position: absolute; inset: 0;
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
   }
-  .screen.active {
-    display: flex;
-  }
+  .screen.active { display: flex; }
 
-  /* Title Screen */
+  /* ========== TITLE ========== */
   #title-screen {
-    background: linear-gradient(160deg, #ff9a76 0%, #ff6b6b 40%, #ee5a24 100%);
-    color: white;
+    background: linear-gradient(160deg, #ff9a76 0%, #ff6b6b 45%, #ee5a24 100%);
+    overflow: hidden;
   }
-  #title-screen::before {
-    content: '';
-    position: absolute;
-    inset: 0;
+  #title-screen .bg-pattern {
+    position: absolute; inset: 0;
     background: 
-      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 40%),
-      radial-gradient(circle at 80% 70%, rgba(255,200,100,0.2) 0%, transparent 40%);
+      radial-gradient(circle at 15% 25%, rgba(255,255,255,0.18) 0%, transparent 45%),
+      radial-gradient(circle at 85% 75%, rgba(255,220,150,0.25) 0%, transparent 40%);
+  }
+  .title-ahpo {
+    position: absolute;
+    right: 4%; bottom: 0;
+    height: 88%;
+    z-index: 2;
+    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.25));
+    animation: floaty 3.5s ease-in-out infinite;
+  }
+  .title-bun {
+    position: absolute;
+    left: 8%; bottom: 18%;
+    width: 22%;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
+    animation: floaty 3s ease-in-out infinite 0.5s;
+  }
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
   }
   .title-content {
-    position: relative;
-    z-index: 2;
+    position: relative; z-index: 5;
     text-align: center;
+    margin-right: 28%;
   }
   .game-logo {
-    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-size: clamp(2.4rem, 5.5vw, 4.2rem);
     font-weight: 900;
-    text-shadow: 0 4px 0 #c0392b, 0 8px 20px rgba(0,0,0,0.3);
-    margin-bottom: 0.3em;
-    letter-spacing: 0.05em;
+    color: white;
+    text-shadow: 0 4px 0 #c0392b, 0 10px 25px rgba(0,0,0,0.35);
+    letter-spacing: 0.06em;
+    margin-bottom: 0.15em;
   }
   .game-subtitle {
-    font-size: clamp(1rem, 2.2vw, 1.5rem);
-    opacity: 0.95;
-    margin-bottom: 2em;
+    font-size: clamp(1.05rem, 2.3vw, 1.55rem);
+    color: rgba(255,255,255,0.95);
     font-weight: 500;
+    margin-bottom: 1.8em;
   }
   .start-btn {
-    background: #fff;
-    color: #e74c3c;
+    background: white; color: #e74c3c;
     border: none;
-    padding: 0.9em 2.8em;
-    font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    padding: 0.95em 3em;
+    font-size: clamp(1.15rem, 2.3vw, 1.5rem);
     font-weight: 700;
     border-radius: 50px;
     cursor: pointer;
-    box-shadow: 0 6px 0 #c0392b, 0 10px 25px rgba(0,0,0,0.25);
-    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 7px 0 #c0392b, 0 12px 30px rgba(0,0,0,0.28);
+    transition: transform 0.12s, box-shadow 0.12s;
     font-family: inherit;
   }
   .start-btn:hover {
-    transform: translateY(2px);
-    box-shadow: 0 4px 0 #c0392b, 0 6px 15px rgba(0,0,0,0.2);
+    transform: translateY(3px);
+    box-shadow: 0 4px 0 #c0392b, 0 8px 18px rgba(0,0,0,0.22);
   }
   .start-btn:active {
-    transform: translateY(6px);
+    transform: translateY(7px);
     box-shadow: 0 0 0 #c0392b;
   }
-  .deco-buns {
-    position: absolute;
-    font-size: 3rem;
-    opacity: 0.25;
-    animation: float 4s ease-in-out infinite;
-  }
-  .deco-buns:nth-child(1) { top: 12%; left: 8%; animation-delay: 0s; }
-  .deco-buns:nth-child(2) { top: 18%; right: 10%; animation-delay: 1s; }
-  .deco-buns:nth-child(3) { bottom: 15%; left: 15%; animation-delay: 2s; }
-  .deco-buns:nth-child(4) { bottom: 20%; right: 12%; animation-delay: 0.5s; }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-  }
 
-  /* HUD */
+  /* ========== HUD ========== */
   #hud {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 12%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,248,240,0.9) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 2.5%;
-    z-index: 50;
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 11%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.97) 0%, rgba(255,248,240,0.92) 100%);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2.2%;
+    z-index: 40;
     border-bottom: 3px solid #ffccbc;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.07);
   }
   .step-indicator {
-    font-size: clamp(0.9rem, 1.8vw, 1.25rem);
-    font-weight: 700;
-    color: #d35400;
+    font-size: clamp(0.95rem, 1.85vw, 1.3rem);
+    font-weight: 700; color: #d35400;
   }
   .score-box {
     background: #fff3e0;
-    padding: 0.4em 1.2em;
+    padding: 0.35em 1.3em;
     border-radius: 30px;
-    font-weight: 700;
-    color: #e67e22;
-    font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+    font-weight: 700; color: #e67e22;
+    font-size: clamp(0.95rem, 1.7vw, 1.2rem);
     border: 2px solid #ffcc80;
   }
-  .timer-box {
-    font-size: clamp(0.95rem, 1.7vw, 1.2rem);
-    font-weight: 700;
-    color: #c0392b;
-    min-width: 4em;
-    text-align: center;
+  .progress-dots {
+    display: flex; gap: 9px;
   }
+  .dot {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: #ffccbc;
+    transition: all 0.3s;
+  }
+  .dot.done { background: #ff9800; }
+  .dot.current { background: #ff5722; transform: scale(1.35); box-shadow: 0 0 8px rgba(255,87,34,0.5); }
 
-  /* Instruction bar */
-  #instruction-bar {
+  /* ========== INSTRUCTION + AHPO ========== */
+  #guide-area {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 14%;
-    background: linear-gradient(0deg, #fff 0%, #fff8f0 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 3%;
-    z-index: 50;
-    border-top: 3px solid #ffccbc;
-    box-shadow: 0 -4px 15px rgba(0,0,0,0.06);
+    left: 0; top: 11%; bottom: 13%;
+    width: 26%;
+    z-index: 30;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end;
+    padding-bottom: 2%;
   }
-  #instruction-text {
-    font-size: clamp(1rem, 2.1vw, 1.45rem);
+  .ahpo-guide {
+    height: 72%;
+    max-width: 95%;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 15px rgba(0,0,0,0.18));
+    transition: transform 0.3s;
+  }
+  .speech-bubble {
+    position: absolute;
+    top: 8%; left: 8%; right: 4%;
+    background: white;
+    border-radius: 18px;
+    padding: 0.7em 0.9em;
+    font-size: clamp(0.85rem, 1.55vw, 1.15rem);
     font-weight: 600;
     color: #5d4037;
-    text-align: center;
-    line-height: 1.4;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+    border: 2px solid #ffccbc;
+    line-height: 1.35;
+    z-index: 35;
+  }
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -12px; left: 28%;
+    border: 8px solid transparent;
+    border-top-color: white;
   }
 
-  /* Game area */
+  /* ========== GAME AREA ========== */
   #game-area {
     position: absolute;
-    top: 12%;
-    bottom: 14%;
-    left: 0;
-    right: 0;
+    top: 11%; bottom: 13%;
+    left: 26%; right: 0;
     overflow: hidden;
   }
-
-  /* Common elements */
   .kitchen-bg {
-    position: absolute;
-    inset: 0;
-    background: 
-      linear-gradient(180deg, #fff5eb 0%, #ffe0c2 60%, #f5d0a9 100%);
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, #fff5eb 0%, #ffe0c2 60%, #f5d0a9 100%);
   }
-  .counter {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 28%;
-    background: linear-gradient(180deg, #d7a86e 0%, #c48b4f 40%, #a66d3a 100%);
-    border-top: 8px solid #8d6e63;
-    box-shadow: inset 0 8px 20px rgba(0,0,0,0.15);
+  .kitchen-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255,248,240,0.4) 0%, rgba(255,236,210,0.2) 100%);
   }
 
-  /* Buttons */
+  /* ========== BOTTOM BAR ========== */
+  #bottom-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 13%;
+    background: linear-gradient(0deg, #fff 0%, #fff8f0 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 3%;
+    z-index: 40;
+    border-top: 3px solid #ffccbc;
+    box-shadow: 0 -4px 18px rgba(0,0,0,0.06);
+  }
+  #instruction-text {
+    font-size: clamp(1.05rem, 2.1vw, 1.45rem);
+    font-weight: 600; color: #5d4037;
+    text-align: center;
+  }
+
+  /* ========== COMMON ========== */
   .action-btn {
     background: linear-gradient(180deg, #ff8a65 0%, #ff5722 100%);
-    color: white;
-    border: none;
-    padding: 0.7em 1.8em;
+    color: white; border: none;
+    padding: 0.65em 1.9em;
     font-size: clamp(1rem, 1.9vw, 1.3rem);
-    font-weight: 700;
-    border-radius: 40px;
+    font-weight: 700; border-radius: 40px;
     cursor: pointer;
     box-shadow: 0 5px 0 #d84315, 0 8px 20px rgba(0,0,0,0.2);
     transition: transform 0.1s, box-shadow 0.1s;
-    font-family: inherit;
-    z-index: 20;
+    font-family: inherit; z-index: 25;
   }
   .action-btn:hover {
     transform: translateY(2px);
@@ -230,538 +240,365 @@
     transform: translateY(5px);
     box-shadow: 0 0 0 #d84315;
   }
-  .action-btn:disabled {
-    background: #bdbdbd;
-    box-shadow: 0 5px 0 #9e9e9e;
-    cursor: not-allowed;
-  }
 
-  /* ===== STAGE 1: Mix ===== */
-  .ingredient {
-    position: absolute;
-    width: 11%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: grab;
-    font-size: clamp(0.7rem, 1.3vw, 0.95rem);
-    font-weight: 700;
-    color: #5d4037;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.15s;
-    z-index: 10;
-    background: white;
-    border: 3px solid #ffe0b2;
-  }
-  .ingredient:active { cursor: grabbing; transform: scale(1.08); }
-  .ingredient .icon { font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 2px; }
-  .ingredient.used { opacity: 0.35; pointer-events: none; filter: grayscale(0.6); }
-
-  #mix-bowl {
-    position: absolute;
-    width: 28%;
-    aspect-ratio: 1.1;
-    left: 50%;
-    top: 38%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(ellipse at 50% 40%, #fafafa 0%, #e0e0e0 70%, #bdbdbd 100%);
-    border-radius: 50% 50% 45% 45%;
-    border: 6px solid #9e9e9e;
-    box-shadow: 
-      inset 0 -20px 40px rgba(0,0,0,0.1),
-      0 15px 30px rgba(0,0,0,0.15);
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-  #mix-bowl::before {
-    content: '';
-    position: absolute;
-    width: 70%;
-    height: 40%;
-    top: 15%;
-    left: 15%;
-    background: rgba(255,255,255,0.5);
-    border-radius: 50%;
-  }
-  #bowl-content {
-    position: relative;
-    z-index: 2;
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    text-align: center;
-    transition: all 0.3s;
-  }
-
-  /* ===== STAGE 2: Knead ===== */
-  #dough-ball {
-    position: absolute;
-    width: 22%;
-    aspect-ratio: 1;
-    left: 50%;
-    top: 42%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle at 35% 30%, #fff8e7 0%, #f5e6c8 40%, #e8d5a3 100%);
-    border-radius: 50%;
-    box-shadow: 
-      inset -8px -8px 20px rgba(0,0,0,0.08),
-      0 10px 25px rgba(0,0,0,0.15);
-    cursor: grab;
-    z-index: 10;
-    transition: border-radius 0.2s;
-  }
-  #dough-ball.kneading {
-    border-radius: 42% 58% 48% 52%;
-  }
-  #knead-progress {
-    position: absolute;
-    bottom: 18%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40%;
-    height: 18px;
-    background: #ffe0b2;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid #ffb74d;
-  }
-  #knead-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #ff9800, #ff5722);
-    border-radius: 8px;
-    transition: width 0.1s;
-  }
-
-  /* ===== STAGE 3: Fill ===== */
-  .filling-option {
-    position: absolute;
-    width: 14%;
-    aspect-ratio: 1;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    background: white;
-    border: 3px solid #ffe0b2;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    font-weight: 700;
-    color: #5d4037;
-    font-size: clamp(0.75rem, 1.4vw, 1rem);
-    transition: transform 0.15s, border-color 0.15s;
-    z-index: 10;
-  }
-  .filling-option:hover { transform: scale(1.06); }
-  .filling-option.selected {
-    border-color: #ff5722;
-    box-shadow: 0 0 0 4px rgba(255,87,34,0.3);
-    transform: scale(1.08);
-  }
-  .filling-option .icon { font-size: clamp(1.8rem, 3.2vw, 2.6rem); }
-
-  #dough-piece {
-    position: absolute;
-    width: 20%;
-    aspect-ratio: 1;
-    left: 50%;
-    top: 40%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle at 35% 30%, #fff8e7 0%, #f5e6c8 50%, #e8d5a3 100%);
-    border-radius: 50%;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    z-index: 8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(1.5rem, 2.8vw, 2.2rem);
-  }
-  #seal-btn {
-    position: absolute;
-    bottom: 22%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  /* ===== STAGE 4: Rise ===== */
-  #rise-dough {
-    position: absolute;
-    width: 18%;
-    aspect-ratio: 1;
-    left: 50%;
-    top: 42%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle at 35% 30%, #fff8e7 0%, #f5e6c8 50%, #e8d5a3 100%);
-    border-radius: 50%;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    z-index: 8;
-    transition: transform 1.5s ease-out, width 1.5s, height 1.5s;
-  }
-  #rise-progress {
-    position: absolute;
-    bottom: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 35%;
-    height: 16px;
-    background: #e0e0e0;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  #rise-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #81c784, #43a047);
-    transition: width 0.1s linear;
-  }
-  .temp-control {
-    position: absolute;
-    right: 8%;
-    top: 30%;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
-  }
-  .temp-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 3px solid #ffb74d;
-    background: white;
-    font-size: 1.6rem;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .temp-btn.active {
-    background: #ff9800;
-    color: white;
-    border-color: #ef6c00;
-  }
-  #temp-display {
-    font-weight: 700;
-    color: #e65100;
-    font-size: 1.1rem;
-  }
-
-  /* ===== STAGE 5: Steam ===== */
-  #steamer {
-    position: absolute;
-    width: 32%;
-    height: 55%;
-    left: 50%;
-    top: 48%;
-    transform: translate(-50%, -50%);
-    z-index: 5;
-  }
-  .steamer-pot {
-    position: absolute;
-    bottom: 0;
-    left: 10%;
-    right: 10%;
-    height: 45%;
-    background: linear-gradient(180deg, #78909c 0%, #546e7a 50%, #37474f 100%);
-    border-radius: 10% 10% 20% 20%;
-    border: 4px solid #455a64;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  }
-  .steamer-lid {
-    position: absolute;
-    top: 5%;
-    left: 5%;
-    right: 5%;
-    height: 35%;
-    background: linear-gradient(180deg, #90a4ae 0%, #607d8b 100%);
-    border-radius: 50% 50% 10% 10%;
-    border: 4px solid #455a64;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-  }
-  .steam {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background: rgba(255,255,255,0.7);
-    border-radius: 50%;
-    opacity: 0;
-    animation: steamRise 2s ease-out infinite;
-  }
-  @keyframes steamRise {
-    0% { transform: translateY(0) scale(0.5); opacity: 0; }
-    20% { opacity: 0.8; }
-    100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
-  }
-  #steam-timer {
-    position: absolute;
-    top: 12%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    font-weight: 900;
-    color: #37474f;
-    text-shadow: 0 2px 4px rgba(255,255,255,0.8);
-  }
-  .fire-control {
-    position: absolute;
-    bottom: 8%;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 15px;
-  }
-  .fire-btn {
-    padding: 0.6em 1.4em;
-    border-radius: 30px;
-    border: 3px solid #ff8a65;
-    background: white;
-    font-weight: 700;
-    cursor: pointer;
-    font-size: clamp(0.85rem, 1.5vw, 1.1rem);
-    color: #e64a19;
-  }
-  .fire-btn.active {
-    background: #ff5722;
-    color: white;
-    border-color: #d84315;
-  }
-
-  /* ===== STAGE 6: Stamp ===== */
-  #bun-to-stamp {
-    position: absolute;
-    width: 22%;
-    aspect-ratio: 1;
-    left: 50%;
-    top: 42%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle at 35% 30%, #fffef8 0%, #fff8e7 40%, #f5e6c8 100%);
-    border-radius: 50%;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-    z-index: 8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  #stamp {
-    position: absolute;
-    width: 14%;
-    aspect-ratio: 1;
-    background: linear-gradient(145deg, #c62828 0%, #b71c1c 100%);
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
-    cursor: grab;
-    z-index: 15;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 900;
-    font-size: clamp(1rem, 2vw, 1.5rem);
-    border: 3px solid #8b0000;
-  }
-  #stamp:active { cursor: grabbing; }
-  #stamp-result {
-    position: absolute;
-    font-weight: 900;
-    color: #c62828;
-    font-size: clamp(1.4rem, 2.8vw, 2.2rem);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
-  .stamp-guide {
-    position: absolute;
-    width: 18%;
-    aspect-ratio: 1;
-    border: 3px dashed rgba(198,40,40,0.4);
-    border-radius: 50%;
-    left: 50%;
-    top: 42%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 7;
-  }
-
-  /* ===== Result Screen ===== */
-  #result-screen {
-    background: linear-gradient(160deg, #fff3e0 0%, #ffe0b2 100%);
-  }
-  .result-content {
-    text-align: center;
-    z-index: 2;
-  }
-  .result-title {
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    font-weight: 900;
-    color: #e65100;
-    margin-bottom: 0.4em;
-  }
-  .result-score {
-    font-size: clamp(2.5rem, 5.5vw, 4.5rem);
-    font-weight: 900;
-    color: #ff5722;
-    margin: 0.2em 0;
-  }
-  .result-rank {
-    font-size: clamp(1.3rem, 2.8vw, 2rem);
-    font-weight: 700;
-    color: #bf360c;
-    margin-bottom: 1.2em;
-  }
-  .result-bun {
-    font-size: clamp(4rem, 10vw, 8rem);
-    margin: 0.3em 0;
-    animation: bounce 1.2s ease infinite;
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-  }
-  .result-btns {
-    display: flex;
-    gap: 1.5em;
-    justify-content: center;
-    margin-top: 1.5em;
-  }
-
-  /* Overlay feedback */
+  /* Feedback popup */
   #feedback {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
-    font-size: clamp(1.8rem, 4vw, 3.2rem);
+    position: absolute; top: 38%; left: 63%;
+    transform: translate(-50%, -50%) scale(0.4);
+    font-size: clamp(2rem, 4.5vw, 3.6rem);
     font-weight: 900;
     color: #ff5722;
-    text-shadow: 0 3px 0 #fff, 0 6px 20px rgba(0,0,0,0.2);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 100;
-    transition: all 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    text-shadow: 0 3px 0 #fff, 0 8px 25px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none; z-index: 100;
+    transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
   }
   #feedback.show {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
 
-  /* Progress dots */
-  .progress-dots {
-    display: flex;
-    gap: 8px;
+  /* Sparkles */
+  .sparkle {
+    position: absolute; pointer-events: none;
+    font-size: 1.6rem; animation: sparkleOut 0.9s ease-out forwards;
+  }
+  @keyframes sparkleOut {
+    0% { opacity: 1; transform: scale(0.5) translateY(0); }
+    100% { opacity: 0; transform: scale(1.4) translateY(-40px); }
+  }
+
+  /* ========== STAGE SPECIFIC ========== */
+  .ingredient {
     position: absolute;
-    top: 3%;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 60;
-  }
-  .dot {
-    width: 12px;
-    height: 12px;
+    width: 14%; aspect-ratio: 1;
     border-radius: 50%;
-    background: #ffccbc;
-    transition: background 0.3s, transform 0.3s;
+    background: white;
+    border: 3px solid #ffe0b2;
+    box-shadow: 0 5px 14px rgba(0,0,0,0.15);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: grab; z-index: 15;
+    font-weight: 700; color: #5d4037;
+    font-size: clamp(0.7rem, 1.25vw, 0.9rem);
+    transition: transform 0.15s;
   }
-  .dot.done { background: #ff9800; }
-  .dot.current { background: #ff5722; transform: scale(1.3); }
+  .ingredient:active { cursor: grabbing; transform: scale(1.1); }
+  .ingredient .icon { font-size: clamp(1.7rem, 3.2vw, 2.5rem); }
+  .ingredient.used { opacity: 0.3; pointer-events: none; filter: grayscale(0.7); }
+
+  #mix-bowl-img {
+    position: absolute;
+    width: 38%; left: 50%; top: 42%;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 12px 25px rgba(0,0,0,0.18));
+    z-index: 8;
+  }
+  #bowl-content {
+    position: absolute;
+    left: 50%; top: 42%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    z-index: 12; pointer-events: none;
+    transition: all 0.3s;
+  }
+
+  #dough-img {
+    position: absolute;
+    width: 32%; left: 50%; top: 42%;
+    transform: translate(-50%, -50%);
+    cursor: grab; z-index: 15;
+    filter: drop-shadow(0 10px 22px rgba(0,0,0,0.18));
+    transition: transform 0.15s;
+  }
+  #knead-progress {
+    position: absolute;
+    bottom: 12%; left: 50%; transform: translateX(-50%);
+    width: 42%; height: 20px;
+    background: #ffe0b2; border-radius: 12px;
+    overflow: hidden; border: 2px solid #ffb74d;
+  }
+  #knead-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #ff9800, #ff5722);
+    border-radius: 10px; transition: width 0.12s;
+  }
+
+  .filling-card {
+    position: absolute;
+    width: 18%; aspect-ratio: 1.1;
+    border-radius: 16px;
+    background: white;
+    border: 3px solid #ffe0b2;
+    box-shadow: 0 5px 14px rgba(0,0,0,0.12);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer; z-index: 15;
+    font-weight: 700; color: #5d4037;
+    font-size: clamp(0.8rem, 1.4vw, 1.05rem);
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .filling-card:hover { transform: scale(1.07); }
+  .filling-card.selected {
+    border-color: #ff5722;
+    box-shadow: 0 0 0 4px rgba(255,87,34,0.35);
+    transform: scale(1.1);
+  }
+  .filling-card .icon { font-size: clamp(2rem, 3.5vw, 2.8rem); margin-bottom: 4px; }
+
+  #dough-fill-img {
+    position: absolute;
+    width: 28%; left: 50%; top: 40%;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.15));
+    z-index: 10;
+  }
+
+  #rise-dough-img {
+    position: absolute;
+    width: 24%; left: 50%; top: 42%;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.15));
+    z-index: 10;
+    transition: transform 1.6s ease-out;
+  }
+  #rise-progress {
+    position: absolute;
+    bottom: 14%; left: 50%; transform: translateX(-50%);
+    width: 38%; height: 18px;
+    background: #e0e0e0; border-radius: 10px; overflow: hidden;
+  }
+  #rise-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #81c784, #43a047);
+    transition: width 0.1s linear;
+  }
+  .temp-control {
+    position: absolute; right: 6%; top: 28%;
+    display: flex; flex-direction: column; gap: 14px; align-items: center;
+  }
+  .temp-btn {
+    width: 64px; height: 64px; border-radius: 50%;
+    border: 3px solid #ffb74d; background: white;
+    font-size: 1.7rem; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .temp-btn.active {
+    background: #ff9800; color: white; border-color: #ef6c00;
+    transform: scale(1.08);
+  }
+  #temp-display {
+    font-weight: 700; color: #e65100; font-size: 1.15rem;
+  }
+
+  #steamer-img {
+    position: absolute;
+    width: 42%; left: 50%; top: 48%;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 12px 28px rgba(0,0,0,0.2));
+    z-index: 10;
+  }
+  #steam-timer {
+    position: absolute;
+    top: 10%; left: 50%; transform: translateX(-50%);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 900; color: #37474f;
+    text-shadow: 0 2px 6px rgba(255,255,255,0.9);
+    z-index: 20;
+  }
+  .fire-control {
+    position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 14px; z-index: 20;
+  }
+  .fire-btn {
+    padding: 0.55em 1.3em; border-radius: 30px;
+    border: 3px solid #ff8a65; background: white;
+    font-weight: 700; cursor: pointer;
+    font-size: clamp(0.9rem, 1.5vw, 1.15rem); color: #e64a19;
+    transition: all 0.2s;
+  }
+  .fire-btn.active {
+    background: #ff5722; color: white; border-color: #d84315;
+  }
+
+  #bun-stamp-img {
+    position: absolute;
+    width: 30%; left: 50%; top: 42%;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 10px 22px rgba(0,0,0,0.15));
+    z-index: 10;
+  }
+  #stamp-img {
+    position: absolute;
+    width: 16%; left: 78%; top: 22%;
+    cursor: grab; z-index: 20;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.25));
+    transition: opacity 0.3s;
+  }
+  .stamp-guide {
+    position: absolute;
+    width: 22%; aspect-ratio: 1;
+    border: 3px dashed rgba(198,40,40,0.45);
+    border-radius: 50%;
+    left: 50%; top: 42%;
+    transform: translate(-50%, -50%);
+    pointer-events: none; z-index: 8;
+  }
+  #stamp-result {
+    position: absolute;
+    left: 50%; top: 42%;
+    transform: translate(-50%, -50%);
+    font-weight: 900; color: #c62828;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    opacity: 0; pointer-events: none; z-index: 15;
+    transition: opacity 0.35s;
+  }
+
+  /* ========== RESULT ========== */
+  #result-screen {
+    background: linear-gradient(160deg, #fff3e0 0%, #ffe0b2 100%);
+  }
+  .result-ahpo {
+    position: absolute;
+    right: 3%; bottom: 0; height: 85%;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
+  }
+  .result-content {
+    position: relative; z-index: 5;
+    text-align: center;
+    margin-right: 26%;
+  }
+  .result-title {
+    font-size: clamp(1.9rem, 4.2vw, 3.2rem);
+    font-weight: 900; color: #e65100;
+    margin-bottom: 0.3em;
+  }
+  .result-bun-img {
+    width: 28%; max-width: 220px;
+    margin: 0.4em auto;
+    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.18));
+    animation: bounce 1.3s ease infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+  .result-score {
+    font-size: clamp(2.8rem, 6vw, 4.8rem);
+    font-weight: 900; color: #ff5722;
+  }
+  .result-rank {
+    font-size: clamp(1.25rem, 2.7vw, 1.9rem);
+    font-weight: 700; color: #bf360c;
+    margin: 0.4em 0 1.2em;
+  }
+  .stars {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    margin-bottom: 0.6em;
+    letter-spacing: 0.15em;
+  }
 </style>
 </head>
 <body>
 <div id="game-container">
-  <!-- Title -->
+  <!-- TITLE -->
   <div id="title-screen" class="screen active">
-    <div class="deco-buns">🥟</div>
-    <div class="deco-buns">🥟</div>
-    <div class="deco-buns">🥟</div>
-    <div class="deco-buns">🥟</div>
+    <div class="bg-pattern"></div>
+    <img src="game-assets/ahpo.jpg" class="title-ahpo" alt="阿婆" onerror="this.style.display='none'">
+    <img src="game-assets/finished-bun.jpg" class="title-bun" alt="平安包" onerror="this.style.display='none'">
     <div class="title-content">
       <div class="game-logo">長洲平安包</div>
-      <div class="game-subtitle">Cooking Mama 風格 · 製作平安包</div>
+      <div class="game-subtitle">Cooking Mama 風格 · 同阿婆一齊整平安包</div>
       <button class="start-btn" id="start-btn">開始製作！</button>
     </div>
   </div>
 
-  <!-- Game HUD + Area -->
+  <!-- GAME -->
   <div id="game-screen" class="screen">
     <div id="hud">
       <div class="step-indicator" id="step-text">步驟 1 / 6</div>
+      <div class="progress-dots" id="progress-dots"></div>
       <div class="score-box">分數：<span id="score-val">0</span></div>
-      <div class="timer-box" id="timer-display"></div>
     </div>
-    <div class="progress-dots" id="progress-dots"></div>
+
+    <div id="guide-area">
+      <div class="speech-bubble" id="speech">準備好未？跟住阿婆一齊整平安包啦！</div>
+      <img src="game-assets/ahpo.jpg" class="ahpo-guide" alt="阿婆" onerror="this.style.display='none'">
+    </div>
+
     <div id="game-area">
       <div class="kitchen-bg"></div>
-      <div class="counter"></div>
-      <!-- Dynamic stage content injected here -->
+      <div class="kitchen-overlay"></div>
+      <!-- stage content -->
     </div>
-    <div id="instruction-bar">
-      <div id="instruction-text">準備開始製作長洲平安包啦！</div>
+
+    <div id="bottom-bar">
+      <div id="instruction-text">準備開始製作長洲平安包！</div>
     </div>
     <div id="feedback"></div>
   </div>
 
-  <!-- Result -->
+  <!-- RESULT -->
   <div id="result-screen" class="screen">
+    <img src="game-assets/ahpo.jpg" class="result-ahpo" alt="阿婆" onerror="this.style.display='none'">
     <div class="result-content">
       <div class="result-title">製作完成！</div>
-      <div class="result-bun" id="result-emoji">🥟</div>
+      <div class="stars" id="result-stars">★★★★★</div>
+      <img src="game-assets/finished-bun.jpg" class="result-bun-img" alt="平安包" id="result-bun" onerror="this.style.display='none'">
       <div class="result-score" id="final-score">0</div>
       <div class="result-rank" id="final-rank">完美！</div>
-      <div class="result-btns">
-        <button class="action-btn" id="retry-btn">再整一次</button>
-      </div>
+      <button class="action-btn" id="retry-btn">再整一次</button>
     </div>
   </div>
 </div>
 
 <script>
 (function() {
-  // ========== STATE ==========
   const state = {
-    score: 0,
-    stage: 0,
-    maxStages: 6,
-    stageScores: [],
-    ingredientsAdded: [],
-    kneadCount: 0,
-    selectedFilling: null,
-    sealed: false,
-    riseProgress: 0,
-    steamTime: 0,
-    steamFire: 1, // 0 low, 1 med, 2 high
-    stamped: false,
-    stampAccuracy: 0
+    score: 0, stage: 0, maxStages: 6,
+    ingredientsAdded: [], kneadCount: 0,
+    selectedFilling: null, riseProgress: 0,
+    steamTime: 0, steamFire: 1, stamped: false
   };
 
   const STAGES = [
-    { name: '混合材料', instruction: '將正確材料拖入大碗！（麵粉、酵母、沙糖、泡打粉、水）' },
-    { name: '搓麵糰', instruction: '用滑鼠／手指用力來回搓麵糰，搓到光滑為止！' },
-    { name: '包餡料', instruction: '揀選你鍾意嘅餡料，再撳「封口」！' },
-    { name: '發酵', instruction: '保持適當溫度，等麵糰發酵脹大！' },
-    { name: '蒸包', instruction: '調校火候，準時蒸熟平安包（目標 12–15 秒）！' },
-    { name: '蓋平安印', instruction: '將紅色印章準確蓋喺包子正中央！' }
+    { name: '混合材料', speech: '將正確材料拖入大碗！記住：麵粉、酵母、沙糖、泡打粉同水～', instruction: '拖曳正確材料入大碗（唔好加多餘嘅！）' },
+    { name: '搓麵糰', speech: '用力搓！搓到麵糰光滑有彈性先得～', instruction: '用滑鼠／手指用力來回搓麵糰' },
+    { name: '包餡料', speech: '揀你最鍾意嘅餡！傳統有麻蓉、蓮蓉、豆沙～', instruction: '揀餡料，再撳「封口搓圓」' },
+    { name: '發酵', speech: '溫度要啱！太凍太熱都唔得，保持溫暖最好～', instruction: '調校溫度，等麵糰發酵脹大' },
+    { name: '蒸包', speech: '中火最穩陣！大約12至15秒就出爐啦～', instruction: '調火候，準時撳「出爐」 (目標12-15秒)' },
+    { name: '蓋平安印', speech: '最後一步！將印章準確蓋喺正中央，就完美啦！', instruction: '拖動印章，蓋喺包子正中央' }
   ];
 
-  // ========== DOM ==========
   const $ = id => document.getElementById(id);
   const gameArea = $('game-area');
+  const speechEl = $('speech');
   const instructionText = $('instruction-text');
   const stepText = $('step-text');
   const scoreVal = $('score-val');
   const feedbackEl = $('feedback');
   const progressDots = $('progress-dots');
 
-  // ========== UTILS ==========
   function showFeedback(text, color = '#ff5722') {
     feedbackEl.textContent = text;
     feedbackEl.style.color = color;
     feedbackEl.classList.add('show');
-    setTimeout(() => feedbackEl.classList.remove('show'), 900);
+    spawnSparkles();
+    setTimeout(() => feedbackEl.classList.remove('show'), 950);
+  }
+
+  function spawnSparkles() {
+    for (let i = 0; i < 6; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.textContent = ['✨','⭐','🌟'][i % 3];
+      s.style.left = (55 + Math.random() * 20) + '%';
+      s.style.top = (30 + Math.random() * 25) + '%';
+      s.style.animationDelay = (i * 0.08) + 's';
+      gameArea.appendChild(s);
+      setTimeout(() => s.remove(), 1000);
+    }
   }
 
   function addScore(pts) {
@@ -779,48 +616,40 @@
   }
 
   function clearGameArea() {
-    // Keep bg and counter
-    const children = [...gameArea.children];
-    children.forEach(c => {
-      if (!c.classList.contains('kitchen-bg') && !c.classList.contains('counter')) {
-        c.remove();
-      }
+    [...gameArea.children].forEach(c => {
+      if (!c.classList.contains('kitchen-bg') && !c.classList.contains('kitchen-overlay')) c.remove();
     });
   }
 
-  // ========== STAGE 1: MIX ==========
+  // ===== STAGE 1: MIX =====
   function startMix() {
     clearGameArea();
     state.ingredientsAdded = [];
-    const needed = ['flour', 'yeast', 'sugar', 'baking', 'water'];
+    const needed = ['flour','yeast','sugar','baking','water'];
     const labels = {
-      flour: { icon: '🌾', name: '麵粉' },
-      yeast: { icon: '🦠', name: '酵母' },
-      sugar: { icon: '🍬', name: '沙糖' },
-      baking: { icon: '✨', name: '泡打粉' },
-      water: { icon: '💧', name: '水' },
-      salt: { icon: '🧂', name: '鹽' },
-      oil: { icon: '🫒', name: '油' }
+      flour:{icon:'🌾',name:'麵粉'}, yeast:{icon:'🦠',name:'酵母'},
+      sugar:{icon:'🍬',name:'沙糖'}, baking:{icon:'✨',name:'泡打粉'},
+      water:{icon:'💧',name:'水'}, salt:{icon:'🧂',name:'鹽'}, oil:{icon:'🫒',name:'油'}
     };
 
-    // Bowl
-    const bowl = document.createElement('div');
-    bowl.id = 'mix-bowl';
-    bowl.innerHTML = '<div id="bowl-content">🥣</div>';
+    const bowl = document.createElement('img');
+    bowl.id = 'mix-bowl-img';
+    bowl.src = 'game-assets/bowl.jpg';
+    bowl.alt = '大碗';
+    bowl.onerror = function() { this.style.display='none'; };
     gameArea.appendChild(bowl);
 
-    // Ingredients positions
+    const content = document.createElement('div');
+    content.id = 'bowl-content';
+    content.textContent = '';
+    gameArea.appendChild(content);
+
     const positions = [
-      { top: '18%', left: '8%' },
-      { top: '18%', left: '22%' },
-      { top: '18%', left: '68%' },
-      { top: '18%', left: '82%' },
-      { top: '55%', left: '6%' },
-      { top: '55%', left: '80%' },
-      { top: '70%', left: '20%' }
+      {top:'12%',left:'6%'}, {top:'12%',left:'22%'}, {top:'12%',left:'68%'},
+      {top:'12%',left:'84%'}, {top:'58%',left:'5%'}, {top:'58%',left:'82%'}, {top:'72%',left:'18%'}
     ];
-    const allItems = ['flour', 'yeast', 'sugar', 'baking', 'water', 'salt', 'oil'];
-    allItems.forEach((key, i) => {
+    const allItems = ['flour','yeast','sugar','baking','water','salt','oil'];
+    allItems.forEach((key,i) => {
       const el = document.createElement('div');
       el.className = 'ingredient';
       el.dataset.key = key;
@@ -831,102 +660,93 @@
       makeDraggable(el, bowl, key, needed);
     });
 
-    // Next button (hidden until done)
     const nextBtn = document.createElement('button');
     nextBtn.className = 'action-btn';
     nextBtn.id = 'mix-next';
     nextBtn.textContent = '下一步 →';
-    nextBtn.style.position = 'absolute';
-    nextBtn.style.bottom = '8%';
-    nextBtn.style.right = '5%';
-    nextBtn.style.display = 'none';
+    nextBtn.style.cssText = 'position:absolute;bottom:8%;right:5%;display:none;';
     nextBtn.onclick = () => finishMix(needed);
     gameArea.appendChild(nextBtn);
   }
 
   function makeDraggable(el, bowl, key, needed) {
-    let dragging = false, offsetX, offsetY;
-    const onStart = (e) => {
+    let dragging = false, ox, oy;
+    const onStart = e => {
       if (el.classList.contains('used')) return;
       dragging = true;
       const rect = el.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      offsetX = clientX - rect.left;
-      offsetY = clientY - rect.top;
-      el.style.zIndex = 30;
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      ox = cx - rect.left; oy = cy - rect.top;
+      el.style.zIndex = 40;
     };
-    const onMove = (e) => {
+    const onMove = e => {
       if (!dragging) return;
       e.preventDefault();
-      const container = gameArea.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      let x = clientX - container.left - offsetX;
-      let y = clientY - container.top - offsetY;
-      el.style.left = x + 'px';
-      el.style.top = y + 'px';
-      el.style.right = 'auto';
-      el.style.bottom = 'auto';
+      const cont = gameArea.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      el.style.left = (cx - cont.left - ox) + 'px';
+      el.style.top = (cy - cont.top - oy) + 'px';
+      el.style.right = el.style.bottom = 'auto';
     };
     const onEnd = () => {
       if (!dragging) return;
       dragging = false;
-      el.style.zIndex = 10;
-      const bowlRect = bowl.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      const cx = elRect.left + elRect.width / 2;
-      const cy = elRect.top + elRect.height / 2;
-      if (cx > bowlRect.left && cx < bowlRect.right && cy > bowlRect.top && cy < bowlRect.bottom) {
-        // Dropped in bowl
+      el.style.zIndex = 15;
+      const br = bowl.getBoundingClientRect();
+      const er = el.getBoundingClientRect();
+      const mx = er.left + er.width/2, my = er.top + er.height/2;
+      if (mx > br.left && mx < br.right && my > br.top && my < br.bottom) {
         el.classList.add('used');
         state.ingredientsAdded.push(key);
         const content = $('bowl-content');
         if (needed.includes(key)) {
-          content.textContent = '🥣✨';
+          content.textContent = '✨';
           showFeedback('好！', '#43a047');
           addScore(15);
         } else {
-          content.textContent = '🥣❓';
-          showFeedback('唔需要呢樣！', '#e53935');
+          content.textContent = '❓';
+          showFeedback('唔需要！', '#e53935');
           addScore(-5);
         }
         checkMixDone(needed);
       }
     };
     el.addEventListener('mousedown', onStart);
-    el.addEventListener('touchstart', onStart, { passive: false });
+    el.addEventListener('touchstart', onStart, {passive:false});
     window.addEventListener('mousemove', onMove);
-    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchmove', onMove, {passive:false});
     window.addEventListener('mouseup', onEnd);
     window.addEventListener('touchend', onEnd);
   }
 
   function checkMixDone(needed) {
-    const correct = needed.every(k => state.ingredientsAdded.includes(k));
-    const extras = state.ingredientsAdded.filter(k => !needed.includes(k)).length;
-    if (correct) {
+    if (needed.every(k => state.ingredientsAdded.includes(k))) {
       $('mix-next').style.display = 'block';
-      if (extras === 0) showFeedback('完美材料！', '#43a047');
+      if (state.ingredientsAdded.filter(k => !needed.includes(k)).length === 0)
+        showFeedback('完美材料！', '#43a047');
     }
   }
 
   function finishMix(needed) {
-    const correctCount = needed.filter(k => state.ingredientsAdded.includes(k)).length;
+    const correct = needed.filter(k => state.ingredientsAdded.includes(k)).length;
     const extras = state.ingredientsAdded.filter(k => !needed.includes(k)).length;
-    let pts = correctCount * 20 - extras * 10;
-    if (correctCount === 5 && extras === 0) pts += 30;
+    let pts = correct * 20 - extras * 10;
+    if (correct === 5 && extras === 0) pts += 30;
     addScore(Math.max(0, pts));
-    state.stageScores.push(pts);
     nextStage();
   }
 
-  // ========== STAGE 2: KNEAD ==========
+  // ===== STAGE 2: KNEAD =====
   function startKnead() {
     clearGameArea();
     state.kneadCount = 0;
-    const dough = document.createElement('div');
-    dough.id = 'dough-ball';
+    const dough = document.createElement('img');
+    dough.id = 'dough-img';
+    dough.src = 'game-assets/dough.jpg';
+    dough.alt = '麵糰';
+    dough.onerror = function() { this.style.display='none'; };
     gameArea.appendChild(dough);
 
     const progress = document.createElement('div');
@@ -934,118 +754,107 @@
     progress.innerHTML = '<div id="knead-bar"></div>';
     gameArea.appendChild(progress);
 
-    let lastX = 0, lastY = 0, isDown = false;
-    const neededKneads = 18;
+    let lastX=0, lastY=0, isDown=false;
+    const needed = 16;
 
-    const onDown = (e) => {
+    const onDown = e => {
       isDown = true;
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      lastX = clientX;
-      lastY = clientY;
-      dough.classList.add('kneading');
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      lastX = cx; lastY = cy;
     };
-    const onMove = (e) => {
+    const onMove = e => {
       if (!isDown) return;
       e.preventDefault();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const dist = Math.hypot(clientX - lastX, clientY - lastY);
-      if (dist > 25) {
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      if (Math.hypot(cx-lastX, cy-lastY) > 28) {
         state.kneadCount++;
-        lastX = clientX;
-        lastY = clientY;
-        const pct = Math.min(100, (state.kneadCount / neededKneads) * 100);
+        lastX = cx; lastY = cy;
+        const pct = Math.min(100, (state.kneadCount / needed) * 100);
         $('knead-bar').style.width = pct + '%';
-        // Visual squash
-        const scale = 1 + Math.sin(state.kneadCount * 0.5) * 0.08;
-        dough.style.transform = `translate(-50%, -50%) scale(${scale})`;
-        if (state.kneadCount >= neededKneads) {
+        const scale = 1 + Math.sin(state.kneadCount * 0.6) * 0.09;
+        dough.style.transform = `translate(-50%,-50%) scale(${scale})`;
+        if (state.kneadCount >= needed) {
           showFeedback('搓好啦！', '#43a047');
-          addScore(80);
-          state.stageScores.push(80);
-          setTimeout(nextStage, 800);
+          addScore(85);
+          setTimeout(nextStage, 850);
           isDown = false;
-          dough.onmousedown = null;
         }
       }
     };
     const onUp = () => {
       isDown = false;
-      dough.classList.remove('kneading');
-      dough.style.transform = 'translate(-50%, -50%) scale(1)';
+      dough.style.transform = 'translate(-50%,-50%) scale(1)';
     };
-
     dough.addEventListener('mousedown', onDown);
-    dough.addEventListener('touchstart', onDown, { passive: false });
+    dough.addEventListener('touchstart', onDown, {passive:false});
     window.addEventListener('mousemove', onMove);
-    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchmove', onMove, {passive:false});
     window.addEventListener('mouseup', onUp);
     window.addEventListener('touchend', onUp);
   }
 
-  // ========== STAGE 3: FILL ==========
+  // ===== STAGE 3: FILL =====
   function startFill() {
     clearGameArea();
     state.selectedFilling = null;
-    state.sealed = false;
 
-    const dough = document.createElement('div');
-    dough.id = 'dough-piece';
-    dough.textContent = '🥟';
+    const dough = document.createElement('img');
+    dough.id = 'dough-fill-img';
+    dough.src = 'game-assets/dough.jpg';
+    dough.alt = '麵糰';
+    dough.onerror = function() { this.style.display='none'; };
     gameArea.appendChild(dough);
 
     const fillings = [
-      { key: 'sesame', icon: '🖤', name: '麻蓉', top: '20%', left: '8%' },
-      { key: 'lotus', icon: '🪷', name: '蓮蓉', top: '20%', left: '78%' },
-      { key: 'bean', icon: '🫘', name: '豆沙', top: '55%', left: '8%' }
+      {key:'sesame', icon:'🖤', name:'麻蓉', top:'15%', left:'6%'},
+      {key:'lotus', icon:'🪷', name:'蓮蓉', top:'15%', left:'78%'},
+      {key:'bean', icon:'🫘', name:'豆沙', top:'55%', left:'6%'}
     ];
     fillings.forEach(f => {
       const el = document.createElement('div');
-      el.className = 'filling-option';
-      el.style.top = f.top;
-      el.style.left = f.left;
+      el.className = 'filling-card';
+      el.style.top = f.top; el.style.left = f.left;
       el.innerHTML = `<div class="icon">${f.icon}</div>${f.name}`;
       el.onclick = () => {
-        document.querySelectorAll('.filling-option').forEach(o => o.classList.remove('selected'));
+        document.querySelectorAll('.filling-card').forEach(o => o.classList.remove('selected'));
         el.classList.add('selected');
         state.selectedFilling = f.key;
-        dough.textContent = f.icon;
         showFeedback(f.name + '！', '#43a047');
-        addScore(10);
+        addScore(12);
       };
       gameArea.appendChild(el);
     });
 
     const sealBtn = document.createElement('button');
     sealBtn.className = 'action-btn';
-    sealBtn.id = 'seal-btn';
     sealBtn.textContent = '封口搓圓';
+    sealBtn.style.cssText = 'position:absolute;bottom:12%;left:50%;transform:translateX(-50%);';
     sealBtn.onclick = () => {
       if (!state.selectedFilling) {
         showFeedback('先揀餡料！', '#e53935');
         return;
       }
-      state.sealed = true;
-      dough.textContent = '🥟';
-      dough.style.background = 'radial-gradient(circle at 35% 30%, #fffef8 0%, #fff8e7 50%, #f0e0b8 100%)';
       showFeedback('封得好好！', '#43a047');
-      addScore(50);
-      state.stageScores.push(60);
+      addScore(55);
       setTimeout(nextStage, 900);
     };
     gameArea.appendChild(sealBtn);
   }
 
-  // ========== STAGE 4: RISE ==========
+  // ===== STAGE 4: RISE =====
   function startRise() {
     clearGameArea();
     state.riseProgress = 0;
-    let temp = 1; // 0 cold, 1 warm, 2 hot
+    let temp = 1;
     let interval = null;
 
-    const dough = document.createElement('div');
-    dough.id = 'rise-dough';
+    const dough = document.createElement('img');
+    dough.id = 'rise-dough-img';
+    dough.src = 'game-assets/dough.jpg';
+    dough.alt = '麵糰';
+    dough.onerror = function() { this.style.display='none'; };
     gameArea.appendChild(dough);
 
     const progress = document.createElement('div');
@@ -1063,42 +872,33 @@
     `;
     gameArea.appendChild(controls);
 
-    const tempLabels = ['太凍', '溫暖', '太熱'];
+    const labels = ['太凍','溫暖','太熱'];
     controls.querySelectorAll('.temp-btn').forEach(btn => {
       btn.onclick = () => {
         controls.querySelectorAll('.temp-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         temp = +btn.dataset.t;
-        $('temp-display').textContent = tempLabels[temp];
+        $('temp-display').textContent = labels[temp];
       };
     });
 
     interval = setInterval(() => {
-      let speed = 0;
-      if (temp === 1) speed = 1.8;
-      else if (temp === 2) speed = 0.6; // too hot, slow + risk
-      else speed = 0.3;
-
-      state.riseProgress += speed;
-      if (state.riseProgress > 100) state.riseProgress = 100;
+      let speed = temp === 1 ? 1.9 : temp === 2 ? 0.55 : 0.28;
+      state.riseProgress = Math.min(100, state.riseProgress + speed);
       $('rise-bar').style.width = state.riseProgress + '%';
-
-      // Visual grow
-      const scale = 1 + (state.riseProgress / 100) * 0.55;
-      dough.style.transform = `translate(-50%, -50%) scale(${scale})`;
-
+      const scale = 1 + (state.riseProgress / 100) * 0.6;
+      dough.style.transform = `translate(-50%,-50%) scale(${scale})`;
       if (state.riseProgress >= 100) {
         clearInterval(interval);
-        let pts = temp === 1 ? 90 : temp === 2 ? 50 : 40;
+        const pts = temp === 1 ? 95 : temp === 2 ? 50 : 40;
         showFeedback(temp === 1 ? '發酵完美！' : '發酵完成', temp === 1 ? '#43a047' : '#ff9800');
         addScore(pts);
-        state.stageScores.push(pts);
         setTimeout(nextStage, 1000);
       }
     }, 100);
   }
 
-  // ========== STAGE 5: STEAM ==========
+  // ===== STAGE 5: STEAM =====
   function startSteam() {
     clearGameArea();
     state.steamTime = 0;
@@ -1106,24 +906,17 @@
     let running = true;
     let interval = null;
 
-    const steamer = document.createElement('div');
-    steamer.id = 'steamer';
-    steamer.innerHTML = `
-      <div class="steamer-lid"></div>
-      <div class="steamer-pot"></div>
-      <div id="steam-timer">0.0s</div>
-    `;
+    const steamer = document.createElement('img');
+    steamer.id = 'steamer-img';
+    steamer.src = 'game-assets/steamer.jpg';
+    steamer.alt = '蒸籠';
+    steamer.onerror = function() { this.style.display='none'; };
     gameArea.appendChild(steamer);
 
-    // Steam particles
-    for (let i = 0; i < 6; i++) {
-      const s = document.createElement('div');
-      s.className = 'steam';
-      s.style.left = (30 + i * 8) + '%';
-      s.style.bottom = '50%';
-      s.style.animationDelay = (i * 0.3) + 's';
-      steamer.appendChild(s);
-    }
+    const timer = document.createElement('div');
+    timer.id = 'steam-timer';
+    timer.textContent = '0.0s';
+    gameArea.appendChild(timer);
 
     const fireCtrl = document.createElement('div');
     fireCtrl.className = 'fire-control';
@@ -1145,40 +938,32 @@
     const doneBtn = document.createElement('button');
     doneBtn.className = 'action-btn';
     doneBtn.textContent = '出爐！';
-    doneBtn.style.position = 'absolute';
-    doneBtn.style.bottom = '22%';
-    doneBtn.style.right = '6%';
+    doneBtn.style.cssText = 'position:absolute;bottom:22%;right:6%;';
     doneBtn.onclick = () => {
       if (!running) return;
       running = false;
       clearInterval(interval);
-      // Ideal 12-15s on medium, slight variance ok
       const t = state.steamTime;
       let pts = 0;
       if (t >= 12 && t <= 15.5 && state.steamFire === 1) pts = 100;
-      else if (t >= 11 && t <= 17) pts = 70;
-      else if (t >= 9 && t <= 19) pts = 45;
-      else pts = 20;
+      else if (t >= 11 && t <= 17) pts = 72;
+      else if (t >= 9 && t <= 19) pts = 48;
+      else pts = 22;
       showFeedback(pts >= 90 ? '火候完美！' : pts >= 60 ? '都唔錯！' : '差少少…', pts >= 90 ? '#43a047' : '#ff9800');
       addScore(pts);
-      state.stageScores.push(pts);
       setTimeout(nextStage, 1000);
     };
     gameArea.appendChild(doneBtn);
 
     interval = setInterval(() => {
       if (!running) return;
-      const speed = state.steamFire === 0 ? 0.6 : state.steamFire === 1 ? 1 : 1.5;
+      const speed = state.steamFire === 0 ? 0.55 : state.steamFire === 1 ? 1 : 1.55;
       state.steamTime += 0.1 * speed;
-      $('steam-timer').textContent = state.steamTime.toFixed(1) + 's';
-      // Change steam opacity based on fire
-      document.querySelectorAll('.steam').forEach(s => {
-        s.style.opacity = state.steamFire === 0 ? 0.3 : state.steamFire === 1 ? 0.7 : 1;
-      });
+      timer.textContent = state.steamTime.toFixed(1) + 's';
     }, 100);
   }
 
-  // ========== STAGE 6: STAMP ==========
+  // ===== STAGE 6: STAMP =====
   function startStamp() {
     clearGameArea();
     state.stamped = false;
@@ -1187,84 +972,73 @@
     guide.className = 'stamp-guide';
     gameArea.appendChild(guide);
 
-    const bun = document.createElement('div');
-    bun.id = 'bun-to-stamp';
+    const bun = document.createElement('img');
+    bun.id = 'bun-stamp-img';
+    bun.src = 'game-assets/dough.jpg';
+    bun.alt = '包子';
+    bun.onerror = function() { this.style.display='none'; };
     gameArea.appendChild(bun);
 
-    const stamp = document.createElement('div');
-    stamp.id = 'stamp';
-    stamp.textContent = '平安';
-    stamp.style.left = '75%';
-    stamp.style.top = '25%';
+    const stamp = document.createElement('img');
+    stamp.id = 'stamp-img';
+    stamp.src = 'game-assets/stamp.jpg';
+    stamp.alt = '印章';
+    stamp.onerror = function() { this.style.display='none'; };
     gameArea.appendChild(stamp);
 
-    const resultText = document.createElement('div');
-    resultText.id = 'stamp-result';
-    resultText.textContent = '平安';
-    bun.appendChild(resultText);
+    const result = document.createElement('div');
+    result.id = 'stamp-result';
+    result.textContent = '平安';
+    gameArea.appendChild(result);
 
     let dragging = false, ox, oy;
-
-    const onStart = (e) => {
+    const onStart = e => {
       if (state.stamped) return;
       dragging = true;
       const rect = stamp.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      ox = clientX - rect.left;
-      oy = clientY - rect.top;
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      ox = cx - rect.left; oy = cy - rect.top;
     };
-    const onMove = (e) => {
+    const onMove = e => {
       if (!dragging) return;
       e.preventDefault();
-      const container = gameArea.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      stamp.style.left = (clientX - container.left - ox) + 'px';
-      stamp.style.top = (clientY - container.top - oy) + 'px';
+      const cont = gameArea.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      stamp.style.left = (cx - cont.left - ox) + 'px';
+      stamp.style.top = (cy - cont.top - oy) + 'px';
     };
     const onEnd = () => {
       if (!dragging || state.stamped) return;
       dragging = false;
-      // Check accuracy vs center of bun
-      const bunRect = bun.getBoundingClientRect();
-      const stampRect = stamp.getBoundingClientRect();
-      const bx = bunRect.left + bunRect.width / 2;
-      const by = bunRect.top + bunRect.height / 2;
-      const sx = stampRect.left + stampRect.width / 2;
-      const sy = stampRect.top + stampRect.height / 2;
+      const br = bun.getBoundingClientRect();
+      const sr = stamp.getBoundingClientRect();
+      const bx = br.left + br.width/2, by = br.top + br.height/2;
+      const sx = sr.left + sr.width/2, sy = sr.top + sr.height/2;
       const dist = Math.hypot(sx - bx, sy - by);
-      const maxDist = bunRect.width * 0.35;
+      const maxD = br.width * 0.38;
       let pts = 0;
-      if (dist < maxDist * 0.35) {
-        pts = 100;
-        showFeedback('完美蓋印！', '#43a047');
-      } else if (dist < maxDist * 0.7) {
-        pts = 70;
-        showFeedback('幾準！', '#ff9800');
-      } else {
-        pts = 30;
-        showFeedback('偏咗少少', '#e53935');
-      }
-      state.stampAccuracy = pts;
+      if (dist < maxD * 0.32) { pts = 100; showFeedback('完美蓋印！', '#43a047'); }
+      else if (dist < maxD * 0.65) { pts = 72; showFeedback('幾準！', '#ff9800'); }
+      else { pts = 32; showFeedback('偏咗少少', '#e53935'); }
       state.stamped = true;
-      resultText.style.opacity = '1';
-      stamp.style.opacity = '0.5';
+      result.style.opacity = '1';
+      stamp.style.opacity = '0.45';
       stamp.style.pointerEvents = 'none';
+      bun.src = 'game-assets/finished-bun.jpg';
       addScore(pts);
-      state.stageScores.push(pts);
-      setTimeout(showResult, 1200);
+      setTimeout(showResult, 1300);
     };
-
     stamp.addEventListener('mousedown', onStart);
-    stamp.addEventListener('touchstart', onStart, { passive: false });
+    stamp.addEventListener('touchstart', onStart, {passive:false});
     window.addEventListener('mousemove', onMove);
-    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchmove', onMove, {passive:false});
     window.addEventListener('mouseup', onEnd);
     window.addEventListener('touchend', onEnd);
   }
 
-  // ========== FLOW ==========
+  // ===== FLOW =====
   function nextStage() {
     state.stage++;
     if (state.stage >= state.maxStages) {
@@ -1277,6 +1051,7 @@
 
   function updateUI() {
     stepText.textContent = `步驟 ${state.stage + 1} / ${state.maxStages} · ${STAGES[state.stage].name}`;
+    speechEl.textContent = STAGES[state.stage].speech;
     instructionText.textContent = STAGES[state.stage].instruction;
     updateProgress();
   }
@@ -1290,26 +1065,20 @@
     $('game-screen').classList.remove('active');
     $('result-screen').classList.add('active');
     $('final-score').textContent = state.score;
-    let rank = '', emoji = '🥟';
-    if (state.score >= 450) { rank = '🌟 完美平安包！長洲之光！'; emoji = '🏆🥟'; }
-    else if (state.score >= 350) { rank = '超好食！阿婆都讚！'; emoji = '😋🥟'; }
-    else if (state.score >= 250) { rank = '唔錯呀，可以再練！'; emoji = '👍🥟'; }
-    else { rank = '加油，下次會更好！'; emoji = '💪🥟'; }
+    let rank = '', stars = '';
+    if (state.score >= 460) { rank = '🌟 完美平安包！長洲之光！'; stars = '★★★★★'; }
+    else if (state.score >= 360) { rank = '超好食！阿婆都讚你！'; stars = '★★★★☆'; }
+    else if (state.score >= 260) { rank = '唔錯呀，可以再練！'; stars = '★★★☆☆'; }
+    else { rank = '加油，下次會更好！'; stars = '★★☆☆☆'; }
     $('final-rank').textContent = rank;
-    $('result-emoji').textContent = emoji;
+    $('result-stars').textContent = stars;
   }
 
   function startGame() {
-    state.score = 0;
-    state.stage = 0;
-    state.stageScores = [];
-    state.ingredientsAdded = [];
-    state.kneadCount = 0;
-    state.selectedFilling = null;
-    state.sealed = false;
-    state.riseProgress = 0;
-    state.steamTime = 0;
-    state.stamped = false;
+    state.score = 0; state.stage = 0;
+    state.ingredientsAdded = []; state.kneadCount = 0;
+    state.selectedFilling = null; state.riseProgress = 0;
+    state.steamTime = 0; state.stamped = false;
     scoreVal.textContent = '0';
     $('title-screen').classList.remove('active');
     $('result-screen').classList.remove('active');
@@ -1318,14 +1087,12 @@
     startCurrentStage();
   }
 
-  // Events
   $('start-btn').onclick = startGame;
   $('retry-btn').onclick = startGame;
 
-  // Prevent scroll on mobile
   document.addEventListener('touchmove', e => {
     if (e.target.closest('#game-container')) e.preventDefault();
-  }, { passive: false });
+  }, {passive: false});
 })();
 </script>
 </body>
